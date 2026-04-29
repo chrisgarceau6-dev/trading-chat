@@ -99,7 +99,7 @@
 
   async function fetchQuote(ticker){
     try{
-      const r=await fetch(`https://finnhub.io/api/v1/quote?symbol=${ticker}&token=YOUR_KEY_HERE`);
+      const r=await fetch(`https://finnhub.io/api/v1/quote?symbol=${ticker}&token=_HERE`);
       const d=await r.json();
       if(!d.c||d.c===0)return null;
       const chg=((d.c-d.pc)/d.pc*100).toFixed(2);
