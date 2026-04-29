@@ -30,7 +30,7 @@
   .msg-bubble{padding:14px 16px;border-radius:10px;font-size:14px;line-height:1.65;white-space:pre-wrap;word-break:break-word}
   .msg.user .msg-bubble{background:var(--user-bg);border:1px solid var(--border);border-left:2px solid var(--accent)}
   .msg.ai .msg-bubble{background:var(--ai-bg);border:1px solid var(--border)}
-  #ticker-bar{display:flex;flex-wrap:wrap;gap:6px;padding:0 20px 4px;flex-shrink:0}
+  #ticker-bar{display:flex;flex-wrap:wrap;gap:6px;padding:0 20px 4px;flex-shrink:0;min-height:0}
   .ticker-pill{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;background:var(--accent-dim);color:var(--accent);border:1px solid rgba(200,241,53,.2)}
   .ticker-pill .price{color:var(--text);margin-left:4px}
   .chg.up{color:#4ade80}.chg.down{color:#f87171}
@@ -44,6 +44,7 @@
   .thinking span{width:6px;height:6px;background:var(--muted);border-radius:50%;animation:bounce 1.2s infinite}
   .thinking span:nth-child(2){animation-delay:.2s}.thinking span:nth-child(3){animation-delay:.4s}
   @keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px);background:var(--accent)}}
+  .status-note{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);padding:4px 20px;flex-shrink:0;min-height:18px}
 </style>
 </head>
 <body>
@@ -59,6 +60,7 @@
 </div>
 <div id="chat">
   <div id="ticker-bar"></div>
+  <div id="status-note" class="status-note"></div>
   <div id="messages"></div>
   <div id="input-area">
     <textarea id="user-input" placeholder="Ask about any stock, strike prices, setups..." rows="1"></textarea>
@@ -68,13 +70,14 @@
   </div>
 </div>
 <script>
-  let API_KEY='',history=[],quotes={};
+  const FINNHUB_KEY = 'd7ophj1r01qmthud44cgd7ophj1r01qmthud44d0';
+  let API_KEY='', chatHistory=[], quotes={};
 
-  document.getElementById('go-btn').addEventListener('click',saveKey);
-  document.getElementById('api-key-input').addEventListener('keydown',e=>{ if(e.key==='Enter') saveKey(); });
-  document.getElementById('send-btn').addEventListener('click',send);
-  document.getElementById('user-input').addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();} });
-  document.getElementById('user-input').addEventListener('input',function(){ this.style.height='44px';this.style.height=Math.min(this.scrollHeight,120)+'px'; });
+  document.getElementById('go-btn').addEventListener('click', saveKey);
+  document.getElementById('api-key-input').addEventListener('keydown', e=>{ if(e.key==='Enter') saveKey(); });
+  document.getElementById('send-btn').addEventListener('click', send);
+  document.getElementById('user-input').addEventListener('keydown', e=>{ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();} });
+  document.getElementById('user-input').addEventListener('input', function(){ this.style.height='44px';this.style.height=Math.min(this.scrollHeight,120)+'px'; });
 
   window.onload=()=>{ const k=localStorage.getItem('tc_key'); if(k){API_KEY=k;startChat();} };
 
@@ -88,18 +91,30 @@
     document.getElementById('setup').style.display='none';
     document.getElementById('chat').style.display='flex';
     document.getElementById('status-text').textContent='live';
-    addMsg('ai',"Hey — I'm your trading assistant with live price data. Ask me about any stock, options setups, or trade ideas. Mention a ticker and I'll pull the current price automatically.");
+    addMsg('ai',"Hey — I'm your trading assistant. I research stocks before making any call using live web data. Ask me about specific tickers, options setups, or for a data-backed stock recommendation.");
   }
 
-  function extractTickers(t){
-    const bl=new Set(['I','A','THE','AND','OR','FOR','AT','IS','IT','TO','IN','OF','ON','BE','MY','BY','IF','AS','AN','SO','DO','GO','NO','UP','VS','OTM','ATM','ITM','IV','DTE','ETF','CEO','AI','EV','WHAT','WHATS','PRICE','HOW','CAN','WILL','SHOULD','NOW','GET','SET','BUY','SELL','RN','ARE','WAS','HAS','HAD','ITS','BEEN','HAVE','THIS','THAT','WITH','FROM','THEY','WHEN','THEN','THAN','JUST','ALSO','MORE','SOME']);
-    const m=t.toUpperCase().match(/\b[A-Z]{1,5}\b/g)||[];
-    return[...new Set(m.filter(x=>!bl.has(x)))].slice(0,5);
+  async function extractTickersIntelligently(userMessage){
+    try{
+      const res=await fetch('https://api.anthropic.com/v1/messages',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','x-api-key':API_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+        body:JSON.stringify({
+          model:'claude-haiku-4-5-20251001',
+          max_tokens:100,
+          system:'Extract stock ticker symbols the user is explicitly asking about. Return ONLY a JSON array of uppercase ticker strings. Examples: "whats nvda price" -> ["NVDA"], "give me a stock pick" -> [], "compare TSLA and AAPL" -> ["TSLA","AAPL"], "can you give me a recommendation" -> []. Never include common words. Return only valid JSON array, nothing else.',
+          messages:[{role:'user',content:userMessage}]
+        })
+      });
+      const data=await res.json();
+      const text=data.content[0].text.trim();
+      return JSON.parse(text);
+    }catch{return[];}
   }
 
   async function fetchQuote(ticker){
     try{
-      const r=await fetch(`https://finnhub.io/api/v1/quote?symbol=${ticker}&token=d7ophj1r01qmthud44cgd7ophj1r01qmthud44d0`);
+      const r=await fetch(`https://finnhub.io/api/v1/quote?symbol=${ticker}&token=${FINNHUB_KEY}`);
       const d=await r.json();
       if(!d.c||d.c===0)return null;
       const chg=((d.c-d.pc)/d.pc*100).toFixed(2);
@@ -109,8 +124,12 @@
 
   function renderTickers(q){
     const bar=document.getElementById('ticker-bar');
-    bar.innerHTML=Object.values(q).map(x=>`<div class="ticker-pill">${x.ticker}<span class="price">$${x.price}</span><span class="chg ${x.up?'up':'down'}">${x.up?'+':''}${x.change}%</span></div>`).join('');
+    const vals=Object.values(q);
+    if(vals.length===0){bar.innerHTML='';return;}
+    bar.innerHTML=vals.map(x=>`<div class="ticker-pill">${x.ticker}<span class="price">$${x.price}</span><span class="chg ${x.up?'up':'down'}">${x.up?'+':''}${x.change}%</span></div>`).join('');
   }
+
+  function setNote(t){document.getElementById('status-note').textContent=t;}
 
   function addMsg(role,text){
     const c=document.getElementById('messages');
@@ -120,12 +139,33 @@
     c.appendChild(d);c.scrollTop=c.scrollHeight;
   }
 
-  function showThinking(){
+  function showThinking(label){
+    document.getElementById('thinking')?.remove();
     const c=document.getElementById('messages');
     const d=document.createElement('div');
     d.className='msg ai';d.id='thinking';
-    d.innerHTML=`<div class="msg-label">Assistant</div><div class="thinking"><span></span><span></span><span></span></div>`;
+    d.innerHTML=`<div class="msg-label">${label||'Thinking'}</div><div class="thinking"><span></span><span></span><span></span></div>`;
     c.appendChild(d);c.scrollTop=c.scrollHeight;
+  }
+
+  const SYSTEM=`You are a data-driven trading assistant for a swing trader focused on options with ~$500 max loss / ~$1000 profit target.
+
+RULES:
+- NEVER give a stock recommendation without using web_search first to research it
+- When asked for stock picks, use web_search to find: recent momentum, volume, upcoming catalysts, analyst sentiment, technical levels
+- Always explain what evidence supports your suggestion
+- When [LIVE PRICE DATA] is provided, use those exact prices
+- Give specific strike prices and expirations
+- If data is insufficient to make a confident call, say so
+- Be concise and evidence-based. No fluff, no guessing.`;
+
+  async function callClaude(messages){
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':API_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,tools:[{type:'web_search_20250305',name:'web_search'}],system:SYSTEM,messages})
+    });
+    return res.json();
   }
 
   async function send(){
@@ -136,40 +176,62 @@
     document.getElementById('send-btn').disabled=true;
     addMsg('user',text);
 
-    const tickers=extractTickers(text);
+    setNote('analyzing...');
+    showThinking('Analyzing');
+    const tickers=await extractTickersIntelligently(text);
+
     let priceCtx='';
     if(tickers.length>0){
+      setNote(`fetching live prices for ${tickers.join(', ')}...`);
       const results=await Promise.all(tickers.map(fetchQuote));
       results.forEach(r=>{if(r)quotes[r.ticker]=r;});
-      if(Object.keys(quotes).length>0){
-        renderTickers(quotes);
-        priceCtx='\n\n[LIVE MARKET DATA]\n'+Object.values(quotes).map(q=>`${q.ticker}: $${q.price} (${q.up?'+':''}${q.change}% today)`).join('\n')+'\nUse these exact prices.';
+      renderTickers(quotes);
+      const fetched=results.filter(Boolean);
+      if(fetched.length>0){
+        priceCtx='\n\n[LIVE PRICE DATA]\n'+fetched.map(q=>`${q.ticker}: $${q.price} (${q.up?'+':''}${q.change}% today)`).join('\n');
       }
     }
 
-    history.push({role:'user',content:text+priceCtx});
-    showThinking();
+    setNote('researching with live web data...');
+    showThinking('Researching');
+
+    const userMsg=text+priceCtx;
+    chatHistory.push({role:'user',content:userMsg});
 
     try{
-      const res=await fetch('https://api.anthropic.com/v1/messages',{
-        method:'POST',
-        headers:{'Content-Type':'application/json','x-api-key':API_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-        body:JSON.stringify({
-          model:'claude-sonnet-4-20250514',
-          max_tokens:1000,
-          system:'You are a sharp trading assistant for a swing trader focused on options and defined-risk trades (~$500 max loss / ~$1000 profit target). When [LIVE MARKET DATA] is provided use those exact prices. If no data is provided still answer helpfully with approximate prices — never refuse. Be direct, give specific strikes and expirations. No fluff.',
-          messages:history
-        })
-      });
-      const data=await res.json();
+      let data=await callClaude(chatHistory);
+
+      // Agentic loop: keep going while Claude is using tools
+      while(data.stop_reason==='tool_use'){
+        chatHistory.push({role:'assistant',content:data.content});
+        const toolResults=data.content
+          .filter(b=>b.type==='tool_use')
+          .map(b=>({type:'tool_result',tool_use_id:b.id,content:b.input?JSON.stringify(b.input):'done'}));
+        chatHistory.push({role:'user',content:toolResults});
+        setNote('analyzing search results...');
+        showThinking('Analyzing');
+        data=await callClaude(chatHistory);
+      }
+
       document.getElementById('thinking')?.remove();
-      if(data.error){addMsg('ai','Error: '+data.error.message);history.pop();}
-      else{const reply=data.content[0].text;history.push({role:'assistant',content:reply});addMsg('ai',reply);}
+      setNote('');
+
+      if(data.error){
+        addMsg('ai','Error: '+data.error.message);
+        chatHistory.pop();
+      }else{
+        const textBlocks=data.content.filter(b=>b.type==='text');
+        const reply=textBlocks.map(b=>b.text).join('\n').trim();
+        chatHistory.push({role:'assistant',content:data.content});
+        addMsg('ai',reply||'No response generated.');
+      }
     }catch(e){
       document.getElementById('thinking')?.remove();
+      setNote('');
       addMsg('ai','Connection error. Check your API key.');
-      history.pop();
+      chatHistory.pop();
     }
+
     document.getElementById('send-btn').disabled=false;
   }
 </script>
