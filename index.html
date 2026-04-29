@@ -3,112 +3,131 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TradeChat</title>
+<title>TradeChat Pro</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap');
-  :root{--bg:#0a0a0a;--surface:#111;--border:#1f1f1f;--accent:#c8f135;--accent-dim:rgba(200,241,53,0.1);--text:#e8e8e8;--muted:#555;--user-bg:#161616;--ai-bg:#0f0f0f}
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Unbounded:wght@400;700;900&display=swap');
+  :root{--bg:#080808;--surface:#0e0e0e;--surface2:#141414;--border:#1a1a1a;--border2:#222;--accent:#00ff88;--accent-dim:rgba(0,255,136,0.08);--accent-glow:rgba(0,255,136,0.15);--red:#ff4444;--green:#00ff88;--yellow:#ffcc00;--text:#e0e0e0;--text2:#888;--text3:#444;--mono:'JetBrains Mono',monospace;--display:'Unbounded',sans-serif}
   *{box-sizing:border-box;margin:0;padding:0}
-  body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;height:100dvh;display:flex;flex-direction:column;overflow:hidden}
-  header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:var(--surface)}
-  .logo{font-size:13px;font-weight:800;letter-spacing:.15em;color:var(--accent);text-transform:uppercase}
-  .status{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);font-family:'Space Mono',monospace}
-  .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite}
-  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-  #setup{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;gap:16px}
-  #setup h2{font-size:18px;font-weight:800;color:var(--accent)}
-  #setup p{font-size:13px;color:var(--muted);text-align:center;max-width:320px;line-height:1.6;font-family:'Space Mono',monospace}
-  #api-key-input{width:100%;max-width:380px;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Space Mono',monospace;font-size:12px;outline:none}
-  #api-key-input:focus{border-color:var(--accent)}
-  #go-btn{padding:12px 32px;background:var(--accent);color:#000;border:none;border-radius:8px;font-family:'Syne',sans-serif;font-weight:800;font-size:13px;cursor:pointer}
+  body{background:var(--bg);color:var(--text);font-family:var(--mono);height:100dvh;display:flex;flex-direction:column;overflow:hidden;font-size:13px}
+  header{padding:12px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:var(--surface);position:relative}
+  header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:0.3}
+  .logo{font-family:var(--display);font-size:11px;font-weight:900;letter-spacing:0.2em;color:var(--accent);text-transform:uppercase;display:flex;align-items:center;gap:8px}
+  .logo-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.8)}}
+  .status-badge{font-size:9px;letter-spacing:0.15em;color:var(--text2);display:flex;align-items:center;gap:6px}
+  .status-badge.live{color:var(--accent)}
+  .status-dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+  #setup{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;gap:20px;background:radial-gradient(ellipse at 50% 50%,rgba(0,255,136,0.04) 0%,transparent 70%)}
+  .setup-title{font-family:var(--display);font-size:20px;font-weight:900;color:var(--accent);letter-spacing:0.05em}
+  .setup-sub{font-size:11px;color:var(--text2);text-align:center;max-width:320px;line-height:1.8;letter-spacing:0.05em}
+  .setup-input{width:100%;max-width:400px;padding:14px 18px;background:var(--surface2);border:1px solid var(--border2);border-radius:4px;color:var(--text);font-family:var(--mono);font-size:12px;outline:none;transition:border-color 0.2s,box-shadow 0.2s;letter-spacing:0.05em}
+  .setup-input:focus{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent-glow),0 0 20px var(--accent-dim)}
+  .setup-btn{padding:14px 40px;background:var(--accent);color:#000;border:none;border-radius:4px;font-family:var(--display);font-weight:700;font-size:10px;letter-spacing:0.2em;cursor:pointer;text-transform:uppercase;transition:all 0.2s;box-shadow:0 0 20px var(--accent-dim)}
+  .setup-btn:hover{background:#33ffaa;box-shadow:0 0 30px var(--accent-glow)}
   #chat{display:none;flex:1;flex-direction:column;overflow:hidden}
-  #messages{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px}
-  .msg{display:flex;flex-direction:column;gap:6px;animation:fadeUp .3s ease}
-  @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-  .msg-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-family:'Space Mono',monospace}
+  #ticker-bar{display:flex;flex-wrap:wrap;gap:6px;padding:8px 16px;flex-shrink:0;border-bottom:1px solid var(--border);background:var(--surface);min-height:36px;align-items:center}
+  .ticker-pill{display:flex;align-items:center;gap:6px;font-size:10px;padding:3px 10px;border-radius:2px;background:var(--surface2);border:1px solid var(--border2);letter-spacing:0.08em}
+  .ticker-name{color:var(--accent);font-weight:700}
+  .ticker-price{color:var(--text)}
+  .ticker-chg{font-weight:500}
+  .ticker-chg.up{color:var(--green)}
+  .ticker-chg.dn{color:var(--red)}
+  #status-note{font-size:9px;color:var(--text3);padding:3px 16px;letter-spacing:0.1em;flex-shrink:0;min-height:16px;text-transform:uppercase}
+  #messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
+  .msg{display:flex;flex-direction:column;gap:4px;animation:fadeUp 0.25s ease}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  .msg-label{font-size:8px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;padding:0 2px}
   .msg.user .msg-label{color:var(--accent)}
-  .msg.ai .msg-label{color:var(--muted)}
-  .msg-bubble{padding:14px 16px;border-radius:10px;font-size:14px;line-height:1.65;white-space:pre-wrap;word-break:break-word}
-  .msg.user .msg-bubble{background:var(--user-bg);border:1px solid var(--border);border-left:2px solid var(--accent)}
-  .msg.ai .msg-bubble{background:var(--ai-bg);border:1px solid var(--border)}
-  #ticker-bar{display:flex;flex-wrap:wrap;gap:6px;padding:0 20px 4px;flex-shrink:0;min-height:0}
-  .ticker-pill{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;background:var(--accent-dim);color:var(--accent);border:1px solid rgba(200,241,53,.2)}
-  .ticker-pill .price{color:var(--text);margin-left:4px}
-  .chg.up{color:#4ade80}.chg.down{color:#f87171}
-  #input-area{padding:16px 20px;border-top:1px solid var(--border);display:flex;gap:10px;flex-shrink:0;background:var(--surface)}
-  #user-input{flex:1;padding:12px 16px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Syne',sans-serif;font-size:14px;outline:none;resize:none;height:44px;max-height:120px;overflow-y:auto;line-height:1.4}
+  .msg.ai .msg-label{color:var(--text3)}
+  .msg-bubble{padding:12px 14px;border-radius:4px;line-height:1.7;word-break:break-word;font-size:13px}
+  .msg.user .msg-bubble{background:var(--surface2);border:1px solid var(--border2);border-left:2px solid var(--accent);color:var(--text)}
+  .msg.ai .msg-bubble{background:var(--surface);border:1px solid var(--border);color:var(--text)}
+  .msg-bubble h2{font-family:var(--display);font-size:11px;font-weight:700;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;margin:14px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--border2)}
+  .msg-bubble h2:first-child{margin-top:0}
+  .msg-bubble h3{font-size:10px;color:var(--text2);letter-spacing:0.08em;text-transform:uppercase;margin:10px 0 6px}
+  .msg-bubble strong{color:var(--accent);font-weight:600}
+  .msg-bubble em{color:var(--text2)}
+  .msg-bubble .bullet-line{display:flex;gap:8px;margin:3px 0;padding-left:4px}
+  .msg-bubble .bullet-line::before{content:'▸';color:var(--accent);flex-shrink:0;font-size:10px;margin-top:2px}
+  .msg-bubble .tag{display:inline-block;font-size:10px;padding:1px 6px;border-radius:2px;font-weight:700;letter-spacing:0.05em}
+  .msg-bubble .tag.bull{background:rgba(0,255,136,0.15);color:var(--green);border:1px solid rgba(0,255,136,0.3)}
+  .msg-bubble .tag.bear{background:rgba(255,68,68,0.15);color:var(--red);border:1px solid rgba(255,68,68,0.3)}
+  .msg-bubble .tag.neutral{background:rgba(255,204,0,0.15);color:var(--yellow);border:1px solid rgba(255,204,0,0.3)}
+  .chart-container{margin:10px 0;border-radius:4px;overflow:hidden;border:1px solid var(--border2)}
+  .thinking-wrap{padding:12px 14px;border-radius:4px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;gap:10px}
+  .thinking-label{font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text3)}
+  .dots{display:flex;gap:4px}
+  .dots span{width:5px;height:5px;border-radius:50%;background:var(--accent);animation:bounce 1.2s infinite;opacity:0.4}
+  .dots span:nth-child(2){animation-delay:0.2s}
+  .dots span:nth-child(3){animation-delay:0.4s}
+  @keyframes bounce{0%,60%,100%{transform:translateY(0);opacity:0.4}30%{transform:translateY(-5px);opacity:1}}
+  #input-area{padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;flex-shrink:0;background:var(--surface)}
+  #user-input{flex:1;padding:11px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:4px;color:var(--text);font-family:var(--mono);font-size:13px;outline:none;resize:none;height:42px;max-height:120px;overflow-y:auto;line-height:1.4;transition:border-color 0.2s;letter-spacing:0.02em}
   #user-input:focus{border-color:var(--accent)}
-  #user-input::placeholder{color:var(--muted)}
-  #send-btn{width:44px;height:44px;background:var(--accent);border:none;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-  #send-btn:disabled{opacity:.4;cursor:not-allowed}
-  .thinking{display:flex;gap:4px;padding:14px 16px;background:var(--ai-bg);border:1px solid var(--border);border-radius:10px;width:fit-content}
-  .thinking span{width:6px;height:6px;background:var(--muted);border-radius:50%;animation:bounce 1.2s infinite}
-  .thinking span:nth-child(2){animation-delay:.2s}.thinking span:nth-child(3){animation-delay:.4s}
-  @keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px);background:var(--accent)}}
-  .status-note{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);padding:4px 20px;flex-shrink:0;min-height:18px}
+  #user-input::placeholder{color:var(--text3);font-size:12px}
+  #send-btn{width:42px;height:42px;background:var(--accent);border:none;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s}
+  #send-btn:hover{background:#33ffaa;box-shadow:0 0 16px var(--accent-glow)}
+  #send-btn:disabled{opacity:0.3;cursor:not-allowed}
+  .chart-btn{display:inline-flex;align-items:center;gap:6px;margin-top:8px;padding:5px 12px;background:var(--surface2);border:1px solid var(--border2);border-radius:3px;color:var(--accent);font-family:var(--mono);font-size:10px;letter-spacing:0.1em;cursor:pointer;transition:all 0.2s;text-transform:uppercase}
+  .chart-btn:hover{border-color:var(--accent);background:var(--accent-dim)}
 </style>
 </head>
 <body>
 <header>
-  <div class="logo">⚡ TradeChat</div>
-  <div class="status"><div class="dot"></div><span id="status-text">offline</span></div>
+  <div class="logo"><div class="logo-dot"></div>TradeChat Pro</div>
+  <div class="status-badge" id="status-badge"><div class="status-dot"></div><span id="status-text">OFFLINE</span></div>
 </header>
 <div id="setup">
-  <h2>Connect Your API Key</h2>
-  <p>Paste your Anthropic API key below. It stays in your browser only.</p>
-  <input type="password" id="api-key-input" placeholder="sk-ant-..." />
-  <button id="go-btn">Let's Go</button>
+  <div class="setup-title">CONNECT</div>
+  <div class="setup-sub">Paste your Anthropic API key. Stored locally only — never leaves your browser except to Anthropic.</div>
+  <input type="password" class="setup-input" id="api-key-input" placeholder="sk-ant-api03-..." />
+  <button class="setup-btn" id="go-btn">INITIALIZE</button>
 </div>
 <div id="chat">
   <div id="ticker-bar"></div>
-  <div id="status-note" class="status-note"></div>
+  <div id="status-note"></div>
   <div id="messages"></div>
   <div id="input-area">
-    <textarea id="user-input" placeholder="Ask about any stock, strike prices, setups..." rows="1"></textarea>
+    <textarea id="user-input" placeholder="Ask about any ticker, options setup, or request a researched stock pick..."></textarea>
     <button id="send-btn">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
     </button>
   </div>
 </div>
 <script>
-  const FINNHUB_KEY = 'd7ophj1r01qmthud44cgd7ophj1r01qmthud44d0';
-  let API_KEY='', chatHistory=[], quotes={};
+  const FINNHUB_KEY='d7ophj1r01qmthud44cgd7ophj1r01qmthud44d0';
+  let API_KEY='',chatHistory=[],quotes={};
 
-  document.getElementById('go-btn').addEventListener('click', saveKey);
-  document.getElementById('api-key-input').addEventListener('keydown', e=>{ if(e.key==='Enter') saveKey(); });
-  document.getElementById('send-btn').addEventListener('click', send);
-  document.getElementById('user-input').addEventListener('keydown', e=>{ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();} });
-  document.getElementById('user-input').addEventListener('input', function(){ this.style.height='44px';this.style.height=Math.min(this.scrollHeight,120)+'px'; });
-
-  window.onload=()=>{ const k=localStorage.getItem('tc_key'); if(k){API_KEY=k;startChat();} };
+  document.getElementById('go-btn').addEventListener('click',saveKey);
+  document.getElementById('api-key-input').addEventListener('keydown',e=>{if(e.key==='Enter')saveKey();});
+  document.getElementById('send-btn').addEventListener('click',send);
+  document.getElementById('user-input').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}});
+  document.getElementById('user-input').addEventListener('input',function(){this.style.height='42px';this.style.height=Math.min(this.scrollHeight,120)+'px';});
+  window.onload=()=>{const k=localStorage.getItem('tcp_key');if(k){API_KEY=k;startChat();}};
 
   function saveKey(){
     const k=document.getElementById('api-key-input').value.trim();
     if(!k.startsWith('sk-ant-')){alert('Key should start with sk-ant-');return;}
-    API_KEY=k;localStorage.setItem('tc_key',k);startChat();
+    API_KEY=k;localStorage.setItem('tcp_key',k);startChat();
   }
 
   function startChat(){
     document.getElementById('setup').style.display='none';
     document.getElementById('chat').style.display='flex';
-    document.getElementById('status-text').textContent='live';
-    addMsg('ai',"Hey — I'm your trading assistant. I research stocks before making any call using live web data. Ask me about specific tickers, options setups, or for a data-backed stock recommendation.");
+    document.getElementById('status-text').textContent='LIVE';
+    document.getElementById('status-badge').classList.add('live');
+    addMsg('ai','System online. Every recommendation is backed by live web research, price action, catalyst analysis, and IV context. Ask about any ticker or request a researched trade setup.');
   }
 
-  async function extractTickersIntelligently(userMessage){
+  async function extractTickers(msg){
     try{
       const res=await fetch('https://api.anthropic.com/v1/messages',{
         method:'POST',
         headers:{'Content-Type':'application/json','x-api-key':API_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-        body:JSON.stringify({
-          model:'claude-haiku-4-5-20251001',
-          max_tokens:100,
-          system:'Extract stock ticker symbols the user is explicitly asking about. Return ONLY a JSON array of uppercase ticker strings. Examples: "whats nvda price" -> ["NVDA"], "give me a stock pick" -> [], "compare TSLA and AAPL" -> ["TSLA","AAPL"], "can you give me a recommendation" -> []. Never include common words. Return only valid JSON array, nothing else.',
-          messages:[{role:'user',content:userMessage}]
-        })
+        body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:80,system:'Extract stock ticker symbols the user is explicitly asking about. Return ONLY a JSON array of uppercase tickers. "whats nvda price" -> ["NVDA"]. "give me a pick" -> []. "compare TSLA and AAPL" -> ["TSLA","AAPL"]. "suggest something" -> []. Return only valid JSON array.',messages:[{role:'user',content:msg}]})
       });
-      const data=await res.json();
-      const text=data.content[0].text.trim();
-      return JSON.parse(text);
+      const d=await res.json();
+      return JSON.parse(d.content[0].text.trim());
     }catch{return[];}
   }
 
@@ -118,7 +137,7 @@
       const d=await r.json();
       if(!d.c||d.c===0)return null;
       const chg=((d.c-d.pc)/d.pc*100).toFixed(2);
-      return{ticker,price:d.c.toFixed(2),change:chg,up:parseFloat(chg)>=0};
+      return{ticker,price:d.c.toFixed(2),change:chg,up:parseFloat(chg)>=0,high:d.h?.toFixed(2),low:d.l?.toFixed(2),open:d.o?.toFixed(2),prevClose:d.pc?.toFixed(2)};
     }catch{return null;}
   }
 
@@ -126,17 +145,61 @@
     const bar=document.getElementById('ticker-bar');
     const vals=Object.values(q);
     if(vals.length===0){bar.innerHTML='';return;}
-    bar.innerHTML=vals.map(x=>`<div class="ticker-pill">${x.ticker}<span class="price">$${x.price}</span><span class="chg ${x.up?'up':'down'}">${x.up?'+':''}${x.change}%</span></div>`).join('');
+    bar.innerHTML=vals.map(x=>`<div class="ticker-pill"><span class="ticker-name">${x.ticker}</span><span class="ticker-price">$${x.price}</span><span class="ticker-chg ${x.up?'up':'dn'}">${x.up?'▲':'▼'} ${Math.abs(x.change)}%</span>${x.high?`<span style="color:var(--text3);font-size:9px">H:${x.high} L:${x.low}</span>`:''}</div>`).join('');
   }
 
-  function setNote(t){document.getElementById('status-note').textContent=t;}
+  function renderChart(ticker,bubble){
+    const c=document.createElement('div');
+    c.className='chart-container';
+    c.style.height='280px';
+    const iframe=document.createElement('iframe');
+    iframe.src=`https://s.tradingview.com/widgetembed/?symbol=${encodeURIComponent(ticker)}&interval=D&hidesidetoolbar=1&hidetoptoolbar=0&symboledit=0&saveimage=0&toolbarbg=131722&theme=dark&style=1&timezone=America%2FNew_York&studies=RSI%40tv-basicstudies&hideideas=1&width=100%25&height=280`;
+    iframe.style.cssText='width:100%;height:280px;border:none;display:block;';
+    iframe.allow='fullscreen';
+    c.appendChild(iframe);
+    bubble.appendChild(c);
+  }
 
-  function addMsg(role,text){
+  function renderMarkdown(text){
+    return text
+      .replace(/^## (.+)$/gm,'<h2>$1</h2>')
+      .replace(/^### (.+)$/gm,'<h3>$1</h3>')
+      .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g,'<em>$1</em>')
+      .replace(/^[-•▸] (.+)$/gm,'<div class="bullet-line">$1</div>')
+      .replace(/^\d+\. (.+)$/gm,'<div class="bullet-line">$1</div>')
+      .replace(/`([^`]+)`/g,'<code style="background:var(--surface2);padding:1px 5px;border-radius:2px;color:var(--accent);font-size:11px">$1</code>')
+      .replace(/\b(BULLISH|BULL CALL|BULL PUT)\b/g,'<span class="tag bull">BULL</span>')
+      .replace(/\b(BEARISH|BEAR CALL|BEAR PUT)\b/g,'<span class="tag bear">BEAR</span>')
+      .replace(/\bNEUTRAL\b/g,'<span class="tag neutral">NEUTRAL</span>')
+      .replace(/\n\n/g,'<br><br>')
+      .replace(/\n/g,'<br>');
+  }
+
+  function setNote(t){document.getElementById('status-note').textContent=t?`// ${t}`:'';}
+
+  function addMsg(role,text,tickers){
     const c=document.getElementById('messages');
-    const d=document.createElement('div');
-    d.className=`msg ${role==='user'?'user':'ai'}`;
-    d.innerHTML=`<div class="msg-label">${role==='user'?'You':'Assistant'}</div><div class="msg-bubble">${text}</div>`;
-    c.appendChild(d);c.scrollTop=c.scrollHeight;
+    const wrap=document.createElement('div');
+    wrap.className=`msg ${role==='user'?'user':'ai'}`;
+    const label=document.createElement('div');
+    label.className='msg-label';
+    label.textContent=role==='user'?'YOU':'SYSTEM';
+    const bubble=document.createElement('div');
+    bubble.className='msg-bubble';
+    bubble.innerHTML=role==='user'?text:renderMarkdown(text);
+    wrap.appendChild(label);
+    wrap.appendChild(bubble);
+    if(role==='ai'&&tickers&&tickers.length>0){
+      const btn=document.createElement('button');
+      btn.className='chart-btn';
+      btn.innerHTML=`📈 CHART: ${tickers[0]}`;
+      btn.onclick=()=>{btn.remove();renderChart(tickers[0],bubble);};
+      bubble.appendChild(btn);
+    }
+    c.appendChild(wrap);
+    c.scrollTop=c.scrollHeight;
+    return bubble;
   }
 
   function showThinking(label){
@@ -144,26 +207,54 @@
     const c=document.getElementById('messages');
     const d=document.createElement('div');
     d.className='msg ai';d.id='thinking';
-    d.innerHTML=`<div class="msg-label">${label||'Thinking'}</div><div class="thinking"><span></span><span></span><span></span></div>`;
+    d.innerHTML=`<div class="msg-label">SYSTEM</div><div class="thinking-wrap"><div class="thinking-label">${label||'Processing'}</div><div class="dots"><span></span><span></span><span></span></div></div>`;
     c.appendChild(d);c.scrollTop=c.scrollHeight;
   }
 
-  const SYSTEM=`You are a data-driven trading assistant for a swing trader focused on options with ~$500 max loss / ~$1000 profit target.
+  const SYSTEM=`You are an institutional-grade trading analyst for a sophisticated swing trader.
+Profile: ~$500 max loss / ~$1,000+ profit target. Defined-risk options (spreads, directional plays). 10-30 day swings.
 
-RULES:
-- NEVER give a stock recommendation without using web_search first to research it
-- When asked for stock picks, use web_search to find: recent momentum, volume, upcoming catalysts, analyst sentiment, technical levels
-- Always explain what evidence supports your suggestion
-- When [LIVE PRICE DATA] is provided, use those exact prices
-- Give specific strike prices and expirations
-- If data is insufficient to make a confident call, say so
-- Be concise and evidence-based. No fluff, no guessing.`;
+MANDATORY: Before ANY recommendation, use web_search to research:
+1. Recent price action and momentum (last 1-2 weeks)
+2. Upcoming catalysts (earnings, FDA, macro events)  
+3. IV context — is IV high or low? High IV = favor selling premium. Low IV = favor buying.
+4. Analyst sentiment (recent upgrades/downgrades, price targets)
+5. Sector momentum and macro context
+6. Unusual options activity or volume spikes if available
+
+RESPONSE FORMAT for trade recommendations:
+## SETUP: [TICKER] — [BULLISH/BEARISH/NEUTRAL]
+**Thesis:** [one sentence core edge]
+
+**Evidence:**
+- [specific data point]
+- [catalyst with date]
+- [technical level or pattern]
+
+**IV Context:** [High/Normal/Low IV] — [implication: sell or buy premium]
+
+**Trade:**
+- Structure: [exact structure e.g. "Bull Call Spread"]
+- Strikes: [e.g. "$210/$220 calls"]
+- Expiration: [specific date]
+- Est. Cost: ~$[X] per contract
+- Max Loss: ~$[amount]
+- Max Gain: ~$[amount]  
+- R/R: [X:1]
+
+**Entry:** [specific price or trigger]
+**Stop:** [specific level]
+**Targets:** T1: $[X] | T2: $[X]
+
+**Risk Factors:** [what kills the thesis]
+
+RULES: Never recommend without web research first. Always cite specific data. Always mention earnings dates. Never hold naked options through earnings without flagging it. When LIVE PRICE DATA is provided use those exact numbers. Be direct and specific.`;
 
   async function callClaude(messages){
     const res=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
       headers:{'Content-Type':'application/json','x-api-key':API_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,tools:[{type:'web_search_20250305',name:'web_search'}],system:SYSTEM,messages})
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:2000,tools:[{type:'web_search_20250305',name:'web_search'}],system:SYSTEM,messages})
     });
     return res.json();
   }
@@ -172,44 +263,43 @@ RULES:
     const inp=document.getElementById('user-input');
     const text=inp.value.trim();
     if(!text||!API_KEY)return;
-    inp.value='';inp.style.height='44px';
+    inp.value='';inp.style.height='42px';
     document.getElementById('send-btn').disabled=true;
     addMsg('user',text);
 
-    setNote('analyzing...');
-    showThinking('Analyzing');
-    const tickers=await extractTickersIntelligently(text);
+    setNote('parsing intent...');
+    showThinking('Parsing');
+    const tickers=await extractTickers(text);
 
     let priceCtx='';
     if(tickers.length>0){
-      setNote(`fetching live prices for ${tickers.join(', ')}...`);
+      setNote(`fetching live data: ${tickers.join(', ')}`);
       const results=await Promise.all(tickers.map(fetchQuote));
-      results.forEach(r=>{if(r)quotes[r.ticker]=r;});
-      renderTickers(quotes);
       const fetched=results.filter(Boolean);
+      fetched.forEach(r=>{quotes[r.ticker]=r;});
+      renderTickers(quotes);
       if(fetched.length>0){
-        priceCtx='\n\n[LIVE PRICE DATA]\n'+fetched.map(q=>`${q.ticker}: $${q.price} (${q.up?'+':''}${q.change}% today)`).join('\n');
+        priceCtx='\n\n[LIVE PRICE DATA — use these exact numbers]\n'+fetched.map(q=>`${q.ticker}: $${q.price} (${q.up?'+':''}${q.change}% today | Open: $${q.open} | H: $${q.high} | L: $${q.low} | Prev Close: $${q.prevClose})`).join('\n');
       }
     }
 
     setNote('researching with live web data...');
     showThinking('Researching');
-
-    const userMsg=text+priceCtx;
-    chatHistory.push({role:'user',content:userMsg});
+    chatHistory.push({role:'user',content:text+priceCtx});
 
     try{
       let data=await callClaude(chatHistory);
+      let searchCount=0;
 
-      // Agentic loop: keep going while Claude is using tools
-      while(data.stop_reason==='tool_use'){
+      while(data.stop_reason==='tool_use'&&searchCount<6){
+        searchCount++;
         chatHistory.push({role:'assistant',content:data.content});
-        const toolResults=data.content
-          .filter(b=>b.type==='tool_use')
-          .map(b=>({type:'tool_result',tool_use_id:b.id,content:b.input?JSON.stringify(b.input):'done'}));
+        const toolUses=data.content.filter(b=>b.type==='tool_use');
+        const queries=toolUses.map(b=>b.input?.query||'').filter(Boolean);
+        if(queries.length>0)setNote(`searching: "${queries[0]}"`);
+        const toolResults=toolUses.map(b=>({type:'tool_result',tool_use_id:b.id,content:b.input?`Query: ${JSON.stringify(b.input)}`:'done'}));
         chatHistory.push({role:'user',content:toolResults});
-        setNote('analyzing search results...');
-        showThinking('Analyzing');
+        showThinking(`Analyzing (${searchCount} searches)`);
         data=await callClaude(chatHistory);
       }
 
@@ -223,7 +313,7 @@ RULES:
         const textBlocks=data.content.filter(b=>b.type==='text');
         const reply=textBlocks.map(b=>b.text).join('\n').trim();
         chatHistory.push({role:'assistant',content:data.content});
-        addMsg('ai',reply||'No response generated.');
+        addMsg('ai',reply||'No response generated.',tickers.length>0?tickers:null);
       }
     }catch(e){
       document.getElementById('thinking')?.remove();
@@ -231,7 +321,6 @@ RULES:
       addMsg('ai','Connection error. Check your API key.');
       chatHistory.pop();
     }
-
     document.getElementById('send-btn').disabled=false;
   }
 </script>
