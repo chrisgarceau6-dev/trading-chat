@@ -31,7 +31,6 @@
     overflow: hidden;
   }
 
-  /* HEADER */
   header {
     padding: 16px 20px;
     border-bottom: 1px solid var(--border);
@@ -72,7 +71,6 @@
     50% { opacity: 0.3; }
   }
 
-  /* API KEY SETUP */
   #setup {
     flex: 1;
     display: flex;
@@ -83,11 +81,7 @@
     gap: 16px;
   }
 
-  #setup h2 {
-    font-size: 18px;
-    font-weight: 800;
-    color: var(--accent);
-  }
+  #setup h2 { font-size: 18px; font-weight: 800; color: var(--accent); }
 
   #setup p {
     font-size: 13px;
@@ -130,7 +124,6 @@
 
   #setup button:hover { opacity: 0.85; }
 
-  /* CHAT */
   #chat { display: none; flex: 1; flex-direction: column; overflow: hidden; }
 
   #messages {
@@ -188,7 +181,6 @@
     border: 1px solid var(--border);
   }
 
-  /* TICKER PILLS */
   .ticker-bar {
     display: flex;
     flex-wrap: wrap;
@@ -212,7 +204,6 @@
   .ticker-pill .chg.up { color: #4ade80; }
   .ticker-pill .chg.down { color: #f87171; }
 
-  /* INPUT */
   #input-area {
     padding: 16px 20px;
     border-top: 1px solid var(--border);
@@ -259,7 +250,6 @@
 
   #send-btn:hover { opacity: 0.85; }
   #send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
   #send-btn svg { width: 18px; height: 18px; }
 
   .thinking {
@@ -287,13 +277,6 @@
     0%, 60%, 100% { transform: translateY(0); }
     30% { transform: translateY(-6px); background: var(--accent); }
   }
-
-  .data-note {
-    font-family: 'Space Mono', monospace;
-    font-size: 10px;
-    color: var(--muted);
-    padding: 2px 0 0 2px;
-  }
 </style>
 </head>
 <body>
@@ -303,7 +286,6 @@
   <div class="status"><div class="dot"></div><span id="status-text">offline</span></div>
 </header>
 
-<!-- SETUP SCREEN -->
 <div id="setup">
   <h2>Connect Your API Key</h2>
   <p>Paste your Anthropic API key below. It stays in your browser only — never sent anywhere except Anthropic.</p>
@@ -311,7 +293,6 @@
   <button onclick="saveKey()">Let's Go</button>
 </div>
 
-<!-- CHAT SCREEN -->
 <div id="chat">
   <div id="ticker-bar" class="ticker-bar"></div>
   <div id="messages"></div>
@@ -331,7 +312,6 @@
   let conversationHistory = [];
   let liveQuotes = {};
 
-  // ── SETUP ──────────────────────────────────────────────
   function saveKey() {
     const key = document.getElementById('api-key-input').value.trim();
     if (!key.startsWith('sk-ant-')) {
@@ -355,29 +335,38 @@
     addMessage('ai', `Hey — I'm your trading assistant with live price data. Ask me about any stock, options setups, strike prices, or trade ideas. Just mention a ticker and I'll pull the current price automatically.`);
   }
 
-  // ── TICKER DETECTION ───────────────────────────────────
   function extractTickers(text) {
-    // Match 1-5 uppercase letters that look like tickers
     const upper = text.toUpperCase();
-const matches = upper.match(/\b[A-Z]{1,5}\b/g) || [];
-    const blacklist = new Set(['I','A','THE','AND','OR','FOR','AT','IS','IT','TO','IN','OF','ON','BE','MY','BY','IF','AS','AN','SO','DO','GO','NO','UP','VS','OTM','ATM','ITM','IV','DTE','SPY','QQQ','ETF','CEO','AI','EV']);
+    const matches = upper.match(/\b[A-Z]{1,5}\b/g) || [];
+    const blacklist = new Set([
+      'I','A','THE','AND','OR','FOR','AT','IS','IT','TO','IN','OF','ON','BE',
+      'MY','BY','IF','AS','AN','SO','DO','GO','NO','UP','VS','OTM','ATM','ITM',
+      'IV','DTE','ETF','CEO','AI','EV','WHAT','WHATS','CURRENT','PRICE','HOW',
+      'CAN','WILL','SHOULD','GOOD','BEST','NOW','GET','SET','BUY','SELL','RN',
+      'ARE','WAS','HAS','HAD','ITS','BEEN','HAVE','THIS','THAT','WITH','FROM',
+      'THEY','WHEN','THEN','THAN','JUST','ALSO','MORE','MUCH','SOME'
+    ]);
     return [...new Set(matches.filter(t => !blacklist.has(t)))].slice(0, 5);
   }
 
-  // ── LIVE PRICE FETCH via Yahoo Finance ─────────────────
   async function fetchQuote(ticker) {
-    try {
-      const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=2d`;
-      const res = await fetch(url);
-      const data = await res.json();
-      const meta = data.chart.result[0].meta;
-      const price = meta.regularMarketPrice;
-      const prev = meta.chartPreviousClose;
-      const change = ((price - prev) / prev * 100).toFixed(2);
-      return { ticker, price: price.toFixed(2), change, up: parseFloat(change) >= 0 };
-    } catch {
-      return null;
+    const endpoints = [
+      `https://corsproxy.io/?https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=2d`,
+      `https://corsproxy.io/?https://query2.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=2d`,
+      `https://api.allorigins.win/raw?url=${encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/' + ticker + '?interval=1d&range=2d')}`
+    ];
+    for (const url of endpoints) {
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        const meta = data.chart.result[0].meta;
+        const price = meta.regularMarketPrice;
+        const prev = meta.chartPreviousClose;
+        const change = ((price - prev) / prev * 100).toFixed(2);
+        return { ticker, price: price.toFixed(2), change, up: parseFloat(change) >= 0 };
+      } catch { continue; }
     }
+    return null;
   }
 
   async function fetchAllQuotes(tickers) {
@@ -391,23 +380,15 @@ const matches = upper.match(/\b[A-Z]{1,5}\b/g) || [];
     const bar = document.getElementById('ticker-bar');
     if (Object.keys(quotes).length === 0) { bar.innerHTML = ''; return; }
     bar.innerHTML = Object.values(quotes).map(q =>
-      `<div class="ticker-pill">
-        ${q.ticker}
-        <span class="price">$${q.price}</span>
-        <span class="chg ${q.up ? 'up' : 'down'}">${q.up ? '+' : ''}${q.change}%</span>
-      </div>`
+      `<div class="ticker-pill">${q.ticker}<span class="price">$${q.price}</span><span class="chg ${q.up ? 'up' : 'down'}">${q.up ? '+' : ''}${q.change}%</span></div>`
     ).join('');
   }
 
-  // ── MESSAGES ───────────────────────────────────────────
   function addMessage(role, text) {
     const container = document.getElementById('messages');
     const div = document.createElement('div');
     div.className = `msg ${role === 'user' ? 'user' : 'ai'}`;
-    div.innerHTML = `
-      <div class="msg-label">${role === 'user' ? 'You' : 'Assistant'}</div>
-      <div class="msg-bubble">${text}</div>
-    `;
+    div.innerHTML = `<div class="msg-label">${role === 'user' ? 'You' : 'Assistant'}</div><div class="msg-bubble">${text}</div>`;
     container.appendChild(div);
     container.scrollTop = container.scrollHeight;
     return div;
@@ -418,10 +399,7 @@ const matches = upper.match(/\b[A-Z]{1,5}\b/g) || [];
     const div = document.createElement('div');
     div.className = 'msg ai';
     div.id = 'thinking';
-    div.innerHTML = `
-      <div class="msg-label">Assistant</div>
-      <div class="thinking"><span></span><span></span><span></span></div>
-    `;
+    div.innerHTML = `<div class="msg-label">Assistant</div><div class="thinking"><span></span><span></span><span></span></div>`;
     container.appendChild(div);
     container.scrollTop = container.scrollHeight;
   }
@@ -431,7 +409,6 @@ const matches = upper.match(/\b[A-Z]{1,5}\b/g) || [];
     if (el) el.remove();
   }
 
-  // ── SEND ───────────────────────────────────────────────
   async function sendMessage() {
     const input = document.getElementById('user-input');
     const text = input.value.trim();
@@ -440,10 +417,8 @@ const matches = upper.match(/\b[A-Z]{1,5}\b/g) || [];
     input.value = '';
     input.style.height = '44px';
     document.getElementById('send-btn').disabled = true;
-
     addMessage('user', text);
 
-    // Detect tickers and fetch live prices
     const tickers = extractTickers(text);
     let priceContext = '';
 
@@ -451,21 +426,15 @@ const matches = upper.match(/\b[A-Z]{1,5}\b/g) || [];
       const quotes = await fetchAllQuotes(tickers);
       liveQuotes = { ...liveQuotes, ...quotes };
       renderTickerBar(liveQuotes);
-
       if (Object.keys(quotes).length > 0) {
         priceContext = '\n\n[LIVE MARKET DATA as of right now]\n' +
-          Object.values(quotes).map(q =>
-            `${q.ticker}: $${q.price} (${q.up ? '+' : ''}${q.change}% today)`
-          ).join('\n') +
+          Object.values(quotes).map(q => `${q.ticker}: $${q.price} (${q.up ? '+' : ''}${q.change}% today)`).join('\n') +
           '\nUse these exact prices in your response.';
       }
     }
 
-    // Build message with injected price data
     const userMessage = text + priceContext;
-
     conversationHistory.push({ role: 'user', content: userMessage });
-
     addThinking();
 
     try {
@@ -480,11 +449,7 @@ const matches = upper.match(/\b[A-Z]{1,5}\b/g) || [];
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514',
           max_tokens: 1000,
-          system: `You are a sharp trading assistant for a swing trader who focuses on options, technical setups, and defined-risk trades (~$500 max loss / ~$1000 profit target). 
-
-When live price data is provided in [LIVE MARKET DATA] blocks, use those exact prices — never estimate or say you don't have current prices.
-
-Be direct and specific. Give concrete strike prices, expirations, and reasoning. Flag IV concerns when relevant. Keep responses concise — this is a mobile trading interface. No fluff.`,
+          system: `You are a sharp trading assistant for a swing trader focused on options, technical setups, and defined-risk trades (~$500 max loss / ~$1000 profit target). When live price data is provided in [LIVE MARKET DATA] blocks, use those exact prices. If no live data is provided, still answer helpfully using your best knowledge — never refuse or ask the user to provide data manually. Be direct and specific. Give concrete strike prices, expirations, and reasoning. Keep it concise. No fluff.`,
           messages: conversationHistory
         })
       });
@@ -510,17 +475,12 @@ Be direct and specific. Give concrete strike prices, expirations, and reasoning.
     input.focus();
   }
 
-  // Enter to send, shift+enter for newline
   document.addEventListener('DOMContentLoaded', () => {
     const input = document.getElementById('user-input');
     if (input) {
       input.addEventListener('keydown', e => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-          e.preventDefault();
-          sendMessage();
-        }
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
       });
-
       input.addEventListener('input', () => {
         input.style.height = '44px';
         input.style.height = Math.min(input.scrollHeight, 120) + 'px';
