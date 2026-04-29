@@ -350,143 +350,15 @@
   }
 
   async function fetchQuote(ticker) {
-    const endpoints = [
-      `https://corsproxy.io/?https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=2d`,
-      `https://corsproxy.io/?https://query2.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=2d`,
-      `https://api.allorigins.win/raw?url=${encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/' + ticker + '?interval=1d&range=2d')}`
-    ];
-    for (const url of endpoints) {
-      try {
-        const res = await fetch(url);
-        const data = await res.json();
-        const meta = data.chart.result[0].meta;
-        const price = meta.regularMarketPrice;
-        const prev = meta.chartPreviousClose;
-        const change = ((price - prev) / prev * 100).toFixed(2);
-        return { ticker, price: price.toFixed(2), change, up: parseFloat(change) >= 0 };
-      } catch { continue; }
-    }
-    return null;
-  }
-
-  async function fetchAllQuotes(tickers) {
-    const results = await Promise.all(tickers.map(fetchQuote));
-    const valid = {};
-    results.forEach(r => { if (r) valid[r.ticker] = r; });
-    return valid;
-  }
-
-  function renderTickerBar(quotes) {
-    const bar = document.getElementById('ticker-bar');
-    if (Object.keys(quotes).length === 0) { bar.innerHTML = ''; return; }
-    bar.innerHTML = Object.values(quotes).map(q =>
-      `<div class="ticker-pill">${q.ticker}<span class="price">$${q.price}</span><span class="chg ${q.up ? 'up' : 'down'}">${q.up ? '+' : ''}${q.change}%</span></div>`
-    ).join('');
-  }
-
-  function addMessage(role, text) {
-    const container = document.getElementById('messages');
-    const div = document.createElement('div');
-    div.className = `msg ${role === 'user' ? 'user' : 'ai'}`;
-    div.innerHTML = `<div class="msg-label">${role === 'user' ? 'You' : 'Assistant'}</div><div class="msg-bubble">${text}</div>`;
-    container.appendChild(div);
-    container.scrollTop = container.scrollHeight;
-    return div;
-  }
-
-  function addThinking() {
-    const container = document.getElementById('messages');
-    const div = document.createElement('div');
-    div.className = 'msg ai';
-    div.id = 'thinking';
-    div.innerHTML = `<div class="msg-label">Assistant</div><div class="thinking"><span></span><span></span><span></span></div>`;
-    container.appendChild(div);
-    container.scrollTop = container.scrollHeight;
-  }
-
-  function removeThinking() {
-    const el = document.getElementById('thinking');
-    if (el) el.remove();
-  }
-
-  async function sendMessage() {
-    const input = document.getElementById('user-input');
-    const text = input.value.trim();
-    if (!text || !API_KEY) return;
-
-    input.value = '';
-    input.style.height = '44px';
-    document.getElementById('send-btn').disabled = true;
-    addMessage('user', text);
-
-    const tickers = extractTickers(text);
-    let priceContext = '';
-
-    if (tickers.length > 0) {
-      const quotes = await fetchAllQuotes(tickers);
-      liveQuotes = { ...liveQuotes, ...quotes };
-      renderTickerBar(liveQuotes);
-      if (Object.keys(quotes).length > 0) {
-        priceContext = '\n\n[LIVE MARKET DATA as of right now]\n' +
-          Object.values(quotes).map(q => `${q.ticker}: $${q.price} (${q.up ? '+' : ''}${q.change}% today)`).join('\n') +
-          '\nUse these exact prices in your response.';
-      }
-    }
-
-    const userMessage = text + priceContext;
-    conversationHistory.push({ role: 'user', content: userMessage });
-    addThinking();
-
     try {
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': API_KEY,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true'
-        },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 1000,
-          system: `You are a sharp trading assistant for a swing trader focused on options, technical setups, and defined-risk trades (~$500 max loss / ~$1000 profit target). When live price data is provided in [LIVE MARKET DATA] blocks, use those exact prices. If no live data is provided, still answer helpfully using your best knowledge — never refuse or ask the user to provide data manually. Be direct and specific. Give concrete strike prices, expirations, and reasoning. Keep it concise. No fluff.`,
-          messages: conversationHistory
-        })
-      });
-
+      const res = await fetch(`https://finnhub.io/api/v1/quote?symbol=${ticker}&token=free`);
       const data = await res.json();
-      removeThinking();
-
-      if (data.error) {
-        addMessage('ai', `Error: ${data.error.message}`);
-        conversationHistory.pop();
-      } else {
-        const reply = data.content[0].text;
-        conversationHistory.push({ role: 'assistant', content: reply });
-        addMessage('ai', reply);
-      }
-    } catch (err) {
-      removeThinking();
-      addMessage('ai', `Connection error. Check your API key or network.`);
-      conversationHistory.pop();
+      if (!data.c || data.c === 0) return null;
+      const price = data.c;
+      const prev = data.pc;
+      const change = ((price - prev) / prev * 100).toFixed(2);
+      return { ticker, price: price.toFixed(2), change, up: parseFloat(change) >= 0 };
+    } catch {
+      return null;
     }
-
-    document.getElementById('send-btn').disabled = false;
-    input.focus();
   }
-
-  document.addEventListener('DOMContentLoaded', () => {
-    const input = document.getElementById('user-input');
-    if (input) {
-      input.addEventListener('keydown', e => {
-        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
-      });
-      input.addEventListener('input', () => {
-        input.style.height = '44px';
-        input.style.height = Math.min(input.scrollHeight, 120) + 'px';
-      });
-    }
-  });
-</script>
-</body>
-</html>
