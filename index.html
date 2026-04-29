@@ -358,7 +358,8 @@
   // ── TICKER DETECTION ───────────────────────────────────
   function extractTickers(text) {
     // Match 1-5 uppercase letters that look like tickers
-    const matches = text.match(/\b[A-Z]{1,5}\b/g) || [];
+    const upper = text.toUpperCase();
+const matches = upper.match(/\b[A-Z]{1,5}\b/g) || [];
     const blacklist = new Set(['I','A','THE','AND','OR','FOR','AT','IS','IT','TO','IN','OF','ON','BE','MY','BY','IF','AS','AN','SO','DO','GO','NO','UP','VS','OTM','ATM','ITM','IV','DTE','SPY','QQQ','ETF','CEO','AI','EV']);
     return [...new Set(matches.filter(t => !blacklist.has(t)))].slice(0, 5);
   }
