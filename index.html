@@ -318,45 +318,73 @@ async function fetchPrice(ticker) {
 // ── MACRO BAR ─────────────────────────────────────────────────────
 async function loadMacroBar() {
   const bar = document.getElementById('macro-bar');
-  const results = await Promise.all(MACRO_SYMBOLS.map(fetchPrice));
-  if (results.every(r => !r)) { bar.innerHTML = '<span class="macro-loading">market data unavailable</span>'; return; }
-  bar.innerHTML = results.filter(Boolean).map(q =>
-    `<div class="macro-item" onclick="openChart('${q.ticker}')">
-      <span class="macro-sym">${q.ticker}</span>
-      <span class="macro-price">${q.price ? '$' + q.price : '—'}</span>
-      ${q.chgPct ? `<span class="macro-chg ${q.up ? 'up' : 'dn'}">${q.up ? '▲' : '▼'}${Math.abs(q.chgPct)}%</span>` : ''}
-    </div>`
-  ).join('');
+  bar.innerHTML = '<span class="macro-loading">loading market overview...</span>';
+  
+  const results = [];
+  for (const sym of MACRO_SYMBOLS) {
+    try {
+      // Use grouped daily endpoint which works for ETFs and indices
+      const r = await fetch(`https://api.polygon.io/v2/snapshot/locale/us/markets/stocks/tickers/${sym}?apiKey=${POLYGON_KEY}`);
+      const d = await r.json();
+      if (d.ticker) {
+        const t = d.ticker;
+        const price = t.lastTrade?.p || t.day?.c || t.prevDay?.c;
+        const prev = t.prevDay?.c;
+        const chg = prev && price ? (((price - prev) / prev) * 100).toFixed(2) : null;
+        if (price) results.push({ sym, price: parseFloat(price).toFixed(2), chg, up: chg ? parseFloat(chg) >= 0 : true });
+      }
+    } catch {}
+  }
+
+  if (results.length === 0) {
+    bar.innerHTML = '<span class="macro-loading">// market overview unavailable</span>';
+    return;
+  }
+
+  bar.innerHTML = '';
+  results.forEach(r => {
+    const el = document.createElement('div');
+    el.className = 'macro-item';
+    el.innerHTML = `<span class="macro-sym">${r.sym}</span><span class="macro-price">$${r.price}</span>${r.chg ? `<span class="macro-chg ${r.up ? 'up' : 'dn'}">${r.up ? '+' : ''}${r.chg}%</span>` : ''}`;
+    el.onclick = () => openChart(r.sym);
+    bar.appendChild(el);
+  });
 }
-
 // ── TICKER EXTRACTION ─────────────────────────────────────────────
-const TICKER_BLACKLIST = new Set([
-  'A','I','AM','AN','AS','AT','BE','BY','DO','GO','IF','IN','IS','IT','MY','NO','OF','ON','OR','SO','TO','UP','US','VS',
-  'THE','AND','FOR','ARE','BUT','NOT','YOU','ALL','CAN','WAS','ONE','OUR','OUT','DAY','GET','HAS','HOW','ITS','LET',
-  'MAY','NEW','NOW','OLD','OWN','SAY','TOO','USE','WAY','WHO','WHY','WILL','WITH','BEEN','CALL','LOOK','LONG','SELL',
-  'WHAT','THAT','THIS','HAVE','FROM','THEY','KNOW','WANT','COME','SOME','GOOD','JUST','INTO','THAN','THEN','THEM',
-  'WELL','ALSO','BACK','EVEN','MOST','TELL','WHEN','MUCH','VERY','TRADE','SETUP','STOCK','CHART','PRICE','CHECK',
-  'SHORT','BUY','HOLD','RISK','HIGH','LOW','OPEN','CLOSE','STOP','ENTRY','EXIT','ATM','OTM','ITM','DTE','RSI',
-  'EMA','SMA','MACD','CEO','CFO','IPO','AI','EV','UK','EU','FED','PUT','PUTS','CALL','CALLS','LAST','NEXT',
-  'WEEK','MONTH','YEAR','DATE','TIME','RATE','MOVE','PLAY','IDEA','PICK','SHOW','GIVE','FIND','MAKE','TAKE',
-  'LOOK','SEEM','FEEL','HEAR','SAID','SAYS','LIKE','JUST','OVER','THAN','MORE','LESS','EACH','BOTH','MANY',
-  'SUCH','SAME','ONLY','REAL','MEAN','NEED','HELP','KEEP','AWAY','DOWN','LEFT','DOES','DONE','GOES','WENT',
-  'THEY','THEM','THEN','WHEN','WENT','WERE','YOUR','THEIR','THERE','THESE','THOSE','ABOUT','ABOVE','AFTER',
-  'AGAIN','BELOW','COULD','EVERY','FIRST','FOUND','GREAT','GROUP','NEVER','OTHER','PLACE','RIGHT','SMALL',
-  'THINK','THREE','UNDER','UNTIL','WHERE','WHICH','WHILE','WORLD','WOULD','WRITE','YEARS'
-]);
+// Intelligent ticker extraction via Haiku — no false positives
+const tickerExtractionCache = new Map();
 
-const ALLOWED_TICKERS = new Set(['SPY','QQQ','IWM','VIX','USO','GLD','SLV','TLT','HYG','XLF','XLE','XLK','XLV','DIA','ARKK','SQQQ','TQQQ','UVXY','LABD','SPXU']);
+async function extractTickers(text) {
+  const key = text.trim().toLowerCase().slice(0, 200);
+  if (tickerExtractionCache.has(key)) return tickerExtractionCache.get(key);
+  if (!API_KEY) return [];
 
-function extractTickers(text) {
-  const upper = text.toUpperCase();
-  const matches = upper.match(/\b[A-Z]{1,5}\b/g) || [];
-  return [...new Set(matches.filter(t => {
-    if (ALLOWED_TICKERS.has(t)) return true;
-    if (TICKER_BLACKLIST.has(t)) return false;
-    if (t.length < 2) return false;
-    return true;
-  }))].slice(0, 5);
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': API_KEY,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 60,
+        system: 'Extract ONLY real stock ticker symbols the user is explicitly asking about. Return a JSON array of uppercase strings. "whats nvda price"->["NVDA"]. "give me a pick"->[] "compare TSLA and AAPL"->["TSLA","AAPL"]. "what sectors are hot"->[] "how does SPY look"->["SPY"]. Never include common English words. Return ONLY valid JSON array, nothing else.',
+        messages: [{ role: 'user', content: text }]
+      })
+    });
+    const d = await res.json();
+    const raw = d.content?.[0]?.text?.trim() || '[]';
+    const parsed = JSON.parse(raw);
+    const result = Array.isArray(parsed) ? parsed.slice(0, 5) : [];
+    tickerExtractionCache.set(key, result);
+    return result;
+  } catch {
+    tickerExtractionCache.set(key, []);
+    return [];
+  }
 }
 
 // ── TICKER BAR ────────────────────────────────────────────────────
@@ -936,10 +964,8 @@ async function send() {
         chatHistory.push({ role: 'assistant', content: data.content });
         trimHistory();
 
-        // Extract tickers from AI response too
-        const aiTickers = extractTickers(reply);
-        const allTickers = [...new Set([...tickers, ...aiTickers])];
-        await addToTickerBar(allTickers);
+        // Only use tickers from user input (not AI response - causes false positives)
+        const allTickers = tickers;
 
         // Try to extract trade params for greeks/pnl
         let extras = null;
