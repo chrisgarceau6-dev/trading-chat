@@ -319,11 +319,22 @@ async function fetchPrice(ticker) {
 async function loadMacroBar() {
   const bar = document.getElementById('macro-bar');
   bar.innerHTML = '<span class="macro-loading">loading market overview...</span>';
-  
+
+  // Get yesterday's date for prev close (free tier compatible)
+  function getPrevTradeDate() {
+    const d = new Date();
+    d.setHours(0,0,0,0);
+    // Go back until we hit a weekday
+    do { d.setDate(d.getDate() - 1); } while (d.getDay() === 0 || d.getDay() === 6);
+    return d.toISOString().split('T')[0];
+  }
+
   const results = [];
-  for (const sym of MACRO_SYMBOLS) {
+  const dateStr = getPrevTradeDate();
+
+  await Promise.all(MACRO_SYMBOLS.map(async sym => {
     try {
-      // Use grouped daily endpoint which works for ETFs and indices
+      // Try snapshot first
       const r = await fetch(`https://api.polygon.io/v2/snapshot/locale/us/markets/stocks/tickers/${sym}?apiKey=${POLYGON_KEY}`);
       const d = await r.json();
       if (d.ticker) {
@@ -331,60 +342,94 @@ async function loadMacroBar() {
         const price = t.lastTrade?.p || t.day?.c || t.prevDay?.c;
         const prev = t.prevDay?.c;
         const chg = prev && price ? (((price - prev) / prev) * 100).toFixed(2) : null;
-        if (price) results.push({ sym, price: parseFloat(price).toFixed(2), chg, up: chg ? parseFloat(chg) >= 0 : true });
+        if (price) { results.push({ sym, price: parseFloat(price).toFixed(2), chg, up: chg ? parseFloat(chg) >= 0 : true }); return; }
       }
+      // Fallback: prev close endpoint
+      const r2 = await fetch(`https://api.polygon.io/v1/open-close/${sym}/${dateStr}?adjusted=true&apiKey=${POLYGON_KEY}`);
+      const d2 = await r2.json();
+      if (d2.close) results.push({ sym, price: d2.close.toFixed(2), chg: null, up: true });
     } catch {}
-  }
+  }));
 
   if (results.length === 0) {
-    bar.innerHTML = '<span class="macro-loading">// market overview unavailable</span>';
+    bar.innerHTML = '<span class="macro-loading">// market data unavailable</span>';
     return;
   }
 
+  // Sort by MACRO_SYMBOLS order
+  results.sort((a,b) => MACRO_SYMBOLS.indexOf(a.sym) - MACRO_SYMBOLS.indexOf(b.sym));
   bar.innerHTML = '';
   results.forEach(r => {
     const el = document.createElement('div');
     el.className = 'macro-item';
-    el.innerHTML = `<span class="macro-sym">${r.sym}</span><span class="macro-price">$${r.price}</span>${r.chg ? `<span class="macro-chg ${r.up ? 'up' : 'dn'}">${r.up ? '+' : ''}${r.chg}%</span>` : ''}`;
+    el.innerHTML = `<span class="macro-sym">${r.sym}</span><span class="macro-price">$${r.price}</span>${r.chg ? `<span class="macro-chg ${r.up?'up':'dn'}">${r.up?'+':''}${r.chg}%</span>` : ''}`;
     el.onclick = () => openChart(r.sym);
     bar.appendChild(el);
   });
 }
 // ── TICKER EXTRACTION ─────────────────────────────────────────────
-// Intelligent ticker extraction via Haiku — no false positives
-const tickerExtractionCache = new Map();
+// Smart ticker extraction — no extra API calls
+// Strategy: only extract if word is explicitly referenced with stock intent context
+function extractTickers(text) {
+  const upper = text.toUpperCase();
+  
+  // Giant blacklist of common English words and trading terms that aren't tickers
+  const BL = new Set([
+    'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z',
+    'AM','AN','AS','AT','BE','BY','DO','GO','IF','IN','IS','IT','MY','NO','OF','ON','OR','SO','TO','UP','US','VS',
+    'THE','AND','FOR','ARE','BUT','NOT','YOU','ALL','CAN','WAS','ONE','OUR','OUT','DAY','GET','HAS','HOW','ITS',
+    'LET','MAY','NEW','NOW','OLD','OWN','SAY','TOO','USE','WAY','WHO','WHY','HIM','HER','HIS','SHE','HIM',
+    'WILL','WITH','BEEN','LOOK','LONG','SELL','WHAT','THAT','THIS','HAVE','FROM','THEY','KNOW','WANT','COME',
+    'SOME','GOOD','JUST','INTO','THAN','THEN','THEM','WELL','ALSO','BACK','EVEN','MOST','TELL','WHEN','MUCH',
+    'VERY','TRADE','STOCK','CHART','PRICE','CHECK','SHORT','BUY','HOLD','RISK','HIGH','LOW','OPEN','CLOSE',
+    'STOP','ENTRY','EXIT','ATM','OTM','ITM','DTE','RSI','EMA','SMA','MACD','CEO','CFO','IPO','AI','EV',
+    'UK','EU','FED','PUT','PUTS','CALL','CALLS','LAST','NEXT','WEEK','MONTH','YEAR','DATE','TIME','RATE',
+    'MOVE','PLAY','IDEA','PICK','SHOW','GIVE','FIND','MAKE','TAKE','SEEM','FEEL','HEAR','SAID','SAYS','LIKE',
+    'OVER','MORE','LESS','EACH','BOTH','MANY','SUCH','SAME','ONLY','REAL','MEAN','NEED','HELP','KEEP','AWAY',
+    'DOWN','LEFT','DOES','DONE','GOES','WENT','WERE','YOUR','THEIR','THERE','THESE','THOSE','ABOUT','ABOVE',
+    'AFTER','AGAIN','BELOW','COULD','EVERY','FIRST','FOUND','GREAT','GROUP','NEVER','OTHER','PLACE','RIGHT',
+    'SMALL','THINK','THREE','UNDER','UNTIL','WHERE','WHICH','WHILE','WORLD','WOULD','WRITE','YEARS','SETUP',
+    'TODAY','LOOK','RECO','RECCO','GIVE','BEST','PICK','IDEA','THINK','FEEL','SEEM','SHOW','TELL','FIND',
+    'MAKE','TAKE','COME','WANT','KNOW','NEED','HELP','KEEP','HOLD','SELL','TRADE','LONG','SHORT','RISK',
+    'STOP','LOSS','GAIN','PLAY','MOVE','DATE','TIME','WEEK','MONTH','YEAR','NEXT','LAST','SAME','ONLY',
+    'REAL','GOOD','JUST','WELL','ALSO','BACK','EVEN','MOST','MUCH','VERY','MORE','LESS','SUCH','BOTH',
+    'EACH','MANY','AWAY','DOWN','LEFT','AWAY','OVER','INTO','THAN','THEM','THEN','WHEN','THAT','THIS',
+    'WITH','FROM','HAVE','BEEN','WILL','WHAT','YOUR','THEY','WERE','SAID','HEAR','FEEL','SEEM','CALL',
+    'NOTE','BASE','CASE','BULL','BEAR','NEWS','DATA','INFO','VIEW','LOOK','SHOW','TELL','FIND','MAKE',
+    'TAKE','COME','WANT','KNOW','AREA','ZONE','LINE','PLAN','STEP','TYPE','KIND','SORT','FORM','PART',
+    'SIDE','BACK','NEXT','LAST','MAIN','FULL','OPEN','HIGH','FREE','FAST','SLOW','HARD','EASY','SAFE',
+    'SURE','ABLE','LIVE','MOVE','TURN','KEEP','HOLD','PULL','PUSH','RISE','FALL','JUMP','DROP','HITS',
+    'RUNS','GOES','SETS','GETS','PUTS','SAYS','SEES','USES','ENDS','ADDS','PAYS','CUTS','HITS','WINS',
+    'TOPS','CAPS','BARS','GAPS','LEGS','ARMS','EYES','EARS','DAYS','WAYS','KEYS','MAPS','TIPS','BIDS',
+    'ASKS','FEES','LOTS','SETS','NETS','BEDS','JETS','KITS','LAGS','MATS','RODS','TABS','TAGS','VARS',
+    'JUNK','FUNK','HUNK','BUNK','DUNK','PUNK','SUNK','RUNT','HUNT','FUND','BOND','LOAN','DEBT','CASH',
+    'FEES','COST','LOSS','GAIN','PROFIT','YIELD','RATE','RATIO','TERM','BETA','ALPHA','DELTA','THETA',
+    'VEGA','GAMMA','SIGMA','OMEGA','COULD','WOULD','SHOULD','MIGHT','SHALL','MUST','NEED','WANT','LIKE',
+    'SEEM','FEEL','KNOW','THINK','MEAN','LOOK','SHOW','TELL','FIND','GIVE','TAKE','MAKE','COME','HELP',
+    'KEEP','HOLD','SELL','TRADE','RISK','STOP','MOVE','DATE','TIME','WEEK','MONTH','YEAR','NEXT','LAST',
+    'ALSO','BACK','EVEN','MOST','MUCH','VERY','MORE','LESS','SUCH','BOTH','EACH','MANY','AWAY','DOWN',
+    'LEFT','OVER','INTO','THAN','THEM','THEN','WHEN','WERE','HAVE','BEEN','WILL','WHAT','YOUR','THEY',
+    'FROM','WITH','THIS','THAT','SAID','CALL','NOTE','BASE','CASE','NEWS','DATA','INFO','VIEW','AREA',
+    'ZONE','LINE','PLAN','STEP','TYPE','KIND','SORT','FORM','PART','SIDE','MAIN','FULL','FREE','FAST',
+    'SLOW','HARD','EASY','SAFE','SURE','ABLE','LIVE','TURN','PULL','PUSH','RISE','FALL','JUMP','DROP',
+    'RUNS','SETS','GETS','SAYS','SEES','USES','ENDS','ADDS','PAYS','CUTS','WINS','TOPS','CAPS','BARS',
+    'GAPS','LEGS','DAYS','WAYS','KEYS','TIPS','BIDS','ASKS','LOTS','NETS','JUNK','FUNK','BOND','LOAN',
+    'DEBT','CASH','COST','YIELD','TERM','STILL','THREE','FIRST','ABOVE','EVERY','PLACE','SMALL','THINK',
+    'UNDER','UNTIL','WHICH','WORLD','WRITE','SETUP','TODAY','RECO','RECCO','AHEAD','BASED','RANGE',
+    'ONCE','BEST','TEST','APRIL','KEY','TRY','LL','ME','ONCE','AHEAD','TERM','BULL','BEAR','BASE',
+    'NOTE','RATE','BETA','LONG','PUTS','CALL','GAIN','LOSS','RISK','STOP','DATE','AREA','LINE','PLAN',
+    'FORM','SIDE','MAIN','FULL','LIVE','TURN','PULL','PUSH','RISE','FALL','JUMP','DROP','RUNS','SETS',
+    'GETS','SAYS','SEES','USES','ENDS','ADDS','PAYS','CUTS','WINS','TOPS','GAPS','DAYS','WAYS','TIPS'
+  ]);
 
-async function extractTickers(text) {
-  const key = text.trim().toLowerCase().slice(0, 200);
-  if (tickerExtractionCache.has(key)) return tickerExtractionCache.get(key);
-  if (!API_KEY) return [];
+  // Known ETFs/indices we always want to allow
+  const ALWAYS_ALLOW = new Set([
+    'SPY','QQQ','IWM','VIX','USO','GLD','SLV','TLT','HYG','XLF','XLE','XLK','XLV','XBI','XOP',
+    'DIA','ARKK','SQQQ','TQQQ','UVXY','LABD','SPXU','SPXL','UPRO','SDOW','UDOW','VIXY'
+  ]);
 
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': API_KEY,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 60,
-        system: 'Extract ONLY real stock ticker symbols the user is explicitly asking about. Return a JSON array of uppercase strings. "whats nvda price"->["NVDA"]. "give me a pick"->[] "compare TSLA and AAPL"->["TSLA","AAPL"]. "what sectors are hot"->[] "how does SPY look"->["SPY"]. Never include common English words. Return ONLY valid JSON array, nothing else.',
-        messages: [{ role: 'user', content: text }]
-      })
-    });
-    const d = await res.json();
-    const raw = d.content?.[0]?.text?.trim() || '[]';
-    const parsed = JSON.parse(raw);
-    const result = Array.isArray(parsed) ? parsed.slice(0, 5) : [];
-    tickerExtractionCache.set(key, result);
-    return result;
-  } catch {
-    tickerExtractionCache.set(key, []);
-    return [];
-  }
+  const words = upper.match(/[A-Z]{2,5}/g) || [];
+  return [...new Set(words.filter(w => ALWAYS_ALLOW.has(w) || (!BL.has(w) && w.length >= 2)))].slice(0, 4);
 }
 
 // ── TICKER BAR ────────────────────────────────────────────────────
