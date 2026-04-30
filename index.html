@@ -18,7 +18,6 @@
 html,body{height:100%;overflow:hidden}
 body{background:var(--bg);color:var(--text);font-family:var(--mono);display:flex;flex-direction:column;font-size:13px}
 
-/* HEADER */
 header{padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:var(--surface);position:relative;gap:10px;z-index:10}
 header::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,255,136,0.5),transparent)}
 .logo{font-family:var(--display);font-size:10px;font-weight:900;letter-spacing:0.2em;color:var(--accent);display:flex;align-items:center;gap:7px;white-space:nowrap;text-transform:uppercase}
@@ -33,7 +32,6 @@ header::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px
 .ms-dot.open{background:var(--green);box-shadow:0 0 6px var(--green);animation:blink 2s infinite}
 .ms-dot.pre,.ms-dot.after{background:var(--yellow)}
 
-/* MACRO BAR */
 #macro-bar{display:flex;gap:0;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;overflow-x:auto;scrollbar-width:none}
 #macro-bar::-webkit-scrollbar{display:none}
 .macro-item{display:flex;align-items:center;gap:6px;padding:5px 12px;border-right:1px solid var(--border);font-size:9px;white-space:nowrap;letter-spacing:0.06em;cursor:pointer;transition:background 0.15s}
@@ -44,7 +42,6 @@ header::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px
 .macro-chg.dn{color:var(--red)}
 .macro-loading{color:var(--text3);font-size:9px;padding:5px 12px}
 
-/* SETUP */
 #setup{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;gap:18px;background:radial-gradient(ellipse at 50% 40%,rgba(0,255,136,0.04) 0%,transparent 65%)}
 .setup-title{font-family:var(--display);font-size:17px;font-weight:900;color:var(--accent);letter-spacing:0.06em}
 .setup-sub{font-size:11px;color:var(--text2);text-align:center;max-width:300px;line-height:1.9}
@@ -53,10 +50,8 @@ header::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px
 .setup-btn{padding:12px 36px;background:var(--accent);color:#000;border:none;border-radius:3px;font-family:var(--display);font-weight:700;font-size:9px;letter-spacing:0.2em;cursor:pointer;text-transform:uppercase;transition:all 0.2s}
 .setup-btn:hover{background:#2fffaa;box-shadow:0 0 20px var(--accent-glow)}
 
-/* CHAT */
 #chat{display:none;flex:1;flex-direction:column;overflow:hidden;min-height:0}
 
-/* TICKER BAR */
 #ticker-bar{display:flex;flex-wrap:wrap;gap:4px;padding:6px 12px;flex-shrink:0;border-bottom:1px solid var(--border);background:var(--surface);min-height:32px;align-items:center}
 .tb-label{font-size:8px;color:var(--text3);letter-spacing:0.1em;text-transform:uppercase;margin-right:4px;white-space:nowrap}
 .ticker-pill{display:inline-flex;align-items:center;gap:5px;font-size:9px;padding:2px 8px;border-radius:2px;background:var(--surface2);border:1px solid var(--border2);letter-spacing:0.07em;cursor:pointer;transition:border-color 0.15s;white-space:nowrap}
@@ -67,10 +62,8 @@ header::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px
 .tp-chg.up{color:var(--green)}
 .tp-chg.dn{color:var(--red)}
 
-/* STATUS */
 #status-note{font-size:8px;color:var(--text3);padding:2px 12px;letter-spacing:0.1em;flex-shrink:0;min-height:14px;text-transform:uppercase;transition:opacity 0.3s}
 
-/* MESSAGES */
 #messages{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;min-height:0}
 .msg{display:flex;flex-direction:column;gap:3px;animation:rise 0.2s ease}
 @keyframes rise{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
@@ -82,7 +75,6 @@ header::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px
 .msg.user .msg-bubble{background:var(--surface2);border:1px solid var(--border2);border-left:2px solid var(--accent)}
 .msg.ai .msg-bubble{background:var(--surface);border:1px solid var(--border)}
 
-/* MARKDOWN */
 .msg-bubble h2{font-family:var(--display);font-size:10px;font-weight:700;color:var(--accent);letter-spacing:0.12em;text-transform:uppercase;margin:12px 0 7px;padding-bottom:4px;border-bottom:1px solid var(--border2)}
 .msg-bubble h2:first-child{margin-top:0}
 .msg-bubble h3{font-size:9px;color:var(--text2);letter-spacing:0.08em;text-transform:uppercase;margin:8px 0 4px}
@@ -97,28 +89,23 @@ header::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px
 .tag.bear{background:rgba(255,68,85,0.1);color:var(--red);border:1px solid rgba(255,68,85,0.2)}
 .tag.neutral{background:rgba(255,214,10,0.1);color:var(--yellow);border:1px solid rgba(255,214,10,0.2)}
 
-/* ACTION ROW */
 .msg-actions{display:flex;gap:6px;margin-top:5px;flex-wrap:wrap}
 .action-btn{font-family:var(--mono);font-size:8px;letter-spacing:0.1em;color:var(--text2);background:none;border:1px solid var(--border2);border-radius:2px;padding:3px 9px;cursor:pointer;transition:all 0.2s;text-transform:uppercase}
 .action-btn:hover{color:var(--accent);border-color:var(--accent)}
 
-/* SOURCES */
 .sources-box{margin-top:8px;padding:8px 10px;background:var(--surface2);border:1px solid var(--border2);border-radius:3px;font-size:9px;color:var(--text2);letter-spacing:0.04em;line-height:1.7}
 .sources-title{color:var(--text3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px;font-size:8px}
 
-/* GREEKS */
 .greeks-box{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px;padding:8px;background:var(--surface2);border:1px solid var(--border2);border-radius:3px}
 .greek-item{display:flex;flex-direction:column;gap:2px;align-items:center}
 .greek-label{font-size:7px;color:var(--text3);letter-spacing:0.1em;text-transform:uppercase}
 .greek-val{font-size:11px;font-weight:700;color:var(--text)}
 .greek-note{font-size:7px;color:var(--text2)}
 
-/* PNL CHART */
 .pnl-wrap{margin-top:8px;border:1px solid var(--border2);border-radius:3px;overflow:hidden;background:var(--surface2)}
 .pnl-title{font-size:8px;color:var(--text3);letter-spacing:0.1em;text-transform:uppercase;padding:5px 8px;border-bottom:1px solid var(--border)}
 .pnl-canvas{display:block;width:100%;height:120px}
 
-/* THESIS SPLIT */
 .thesis-split{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
 .thesis-side{padding:8px 10px;border-radius:3px;font-size:11px;line-height:1.6}
 .thesis-side.bull{background:rgba(0,255,136,0.05);border:1px solid rgba(0,255,136,0.15)}
@@ -127,7 +114,6 @@ header::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px
 .thesis-side.bull .thesis-side-title{color:var(--green)}
 .thesis-side.bear .thesis-side-title{color:var(--red)}
 
-/* CHART */
 .chart-wrap{margin:8px 0 4px;border-radius:3px;overflow:hidden;border:1px solid var(--border2);background:#131722}
 .chart-header{display:flex;align-items:center;justify-content:space-between;padding:4px 8px;background:var(--surface2);border-bottom:1px solid var(--border)}
 .chart-title{font-size:8px;color:var(--text2);letter-spacing:0.1em;text-transform:uppercase}
@@ -138,7 +124,6 @@ header::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px
 .chart-iframe-wrap iframe{width:100%;height:100%;border:none;display:block}
 .chart-loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#131722;font-size:9px;color:var(--text3);letter-spacing:0.1em}
 
-/* THINKING */
 .think-wrap{padding:10px 12px;border-radius:3px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;gap:10px}
 .think-label{font-size:8px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text3)}
 .dots{display:flex;gap:3px}
@@ -147,10 +132,8 @@ header::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px
 .dots span:nth-child(3){animation-delay:.4s}
 @keyframes bounce{0%,60%,100%{transform:translateY(0);opacity:0.3}30%{transform:translateY(-4px);opacity:1}}
 
-/* DISCLAIMER */
 .disclaimer{font-size:8px;color:var(--text3);text-align:center;padding:4px 12px;letter-spacing:0.05em;flex-shrink:0;border-top:1px solid var(--border);background:var(--surface)}
 
-/* INPUT */
 #input-area{padding:10px 12px;border-top:1px solid var(--border);display:flex;gap:7px;flex-shrink:0;background:var(--surface)}
 #user-input{flex:1;padding:10px 12px;background:var(--surface2);border:1px solid var(--border2);border-radius:3px;color:var(--text);font-family:var(--mono);font-size:13px;outline:none;resize:none;height:40px;max-height:100px;overflow-y:auto;line-height:1.4;transition:border-color 0.2s;-webkit-appearance:none}
 #user-input:focus{border-color:var(--accent)}
@@ -159,7 +142,6 @@ header::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px
 #send-btn:hover{background:#2fffaa;box-shadow:0 0 14px var(--accent-glow)}
 #send-btn:disabled{opacity:0.2;cursor:not-allowed}
 
-/* MOBILE */
 @media(max-width:600px){
   .thesis-split{grid-template-columns:1fr}
   .greeks-box{grid-template-columns:repeat(2,1fr)}
@@ -207,10 +189,9 @@ header::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px
 </div>
 
 <script>
-// ── CONFIG ────────────────────────────────────────────────────────
 const POLYGON_KEY = 'ZOEYkjGqVVH0Pv2luO3paU_NEAzGEvqW';
 const MACRO_SYMBOLS = ['SPY','QQQ','IWM','VIX','DIA'];
-const MAX_HISTORY = 12; // max message pairs before trimming
+const MAX_HISTORY = 12;
 
 let API_KEY = '';
 let chatHistory = [];
@@ -218,7 +199,6 @@ let mentionedTickers = new Set();
 let tickerPriceCache = {};
 let lastSearches = [];
 
-// ── BOOT ──────────────────────────────────────────────────────────
 document.getElementById('go-btn').addEventListener('click', saveKey);
 document.getElementById('api-key-input').addEventListener('keydown', e => { if (e.key === 'Enter') saveKey(); });
 document.getElementById('send-btn').addEventListener('click', send);
@@ -239,7 +219,6 @@ window.onload = () => {
   if (k) { API_KEY = k; startChat(); }
 };
 
-// ── MARKET STATUS ─────────────────────────────────────────────────
 function updateMarketStatus() {
   const now = new Date();
   const et = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
@@ -251,26 +230,22 @@ function updateMarketStatus() {
   const txt = document.getElementById('ms-text');
   if (day === 0 || day === 6) {
     dot.className = 'ms-dot'; txt.textContent = 'WEEKEND';
-  } else if (time >= 570 && time < 930) { // 9:30-15:30
+  } else if (time >= 570 && time < 960) {
     dot.className = 'ms-dot open'; txt.textContent = 'MARKET OPEN';
-  } else if (time >= 240 && time < 570) { // 4:00-9:30
+  } else if (time >= 240 && time < 570) {
     dot.className = 'ms-dot pre'; txt.textContent = 'PRE-MARKET';
-  } else if (time >= 930 && time < 960) { // 15:30-16:00 (late)
-    dot.className = 'ms-dot open'; txt.textContent = 'MARKET OPEN';
-  } else if (time >= 960 && time < 1200) { // 16:00-20:00
+  } else if (time >= 960 && time < 1200) {
     dot.className = 'ms-dot after'; txt.textContent = 'AFTER-HOURS';
   } else {
     dot.className = 'ms-dot'; txt.textContent = 'CLOSED';
   }
 }
 
-// ── POLYGON PRICE FETCH ───────────────────────────────────────────
 async function fetchPrice(ticker) {
   if (tickerPriceCache[ticker] && (Date.now() - tickerPriceCache[ticker].ts < 60000)) {
     return tickerPriceCache[ticker];
   }
   try {
-    // Try snapshot (real-time during hours)
     const r = await fetch(`https://api.polygon.io/v2/snapshot/locale/us/markets/stocks/tickers/${ticker}?apiKey=${POLYGON_KEY}`);
     const d = await r.json();
     if (d.ticker) {
@@ -282,19 +257,11 @@ async function fetchPrice(ticker) {
       const prevClose = t.prevDay?.c;
       const chgPct = prevClose && price ? (((price - prevClose) / prevClose) * 100).toFixed(2) : null;
       const vol = t.day?.v ? (t.day.v / 1e6).toFixed(1) + 'M' : null;
-      const result = {
-        ticker, price: price?.toFixed(2), open: open?.toFixed(2),
-        high: high?.toFixed(2), low: low?.toFixed(2),
-        prevClose: prevClose?.toFixed(2), chgPct, vol,
-        up: chgPct ? parseFloat(chgPct) >= 0 : true,
-        ts: Date.now()
-      };
+      const result = { ticker, price: price?.toFixed(2), open: open?.toFixed(2), high: high?.toFixed(2), low: low?.toFixed(2), prevClose: prevClose?.toFixed(2), chgPct, vol, up: chgPct ? parseFloat(chgPct) >= 0 : true, ts: Date.now() };
       tickerPriceCache[ticker] = result;
       return result;
     }
   } catch {}
-
-  // Fallback: previous close
   try {
     const today = new Date();
     today.setDate(today.getDate() - 1);
@@ -302,12 +269,7 @@ async function fetchPrice(ticker) {
     const r2 = await fetch(`https://api.polygon.io/v1/open-close/${ticker}/${dateStr}?adjusted=true&apiKey=${POLYGON_KEY}`);
     const d2 = await r2.json();
     if (d2.close) {
-      const result = {
-        ticker, price: d2.close?.toFixed(2), open: d2.open?.toFixed(2),
-        high: d2.high?.toFixed(2), low: d2.low?.toFixed(2),
-        prevClose: null, chgPct: null, vol: d2.volume ? (d2.volume / 1e6).toFixed(1) + 'M' : null,
-        up: true, ts: Date.now(), isDelayed: true
-      };
+      const result = { ticker, price: d2.close?.toFixed(2), open: d2.open?.toFixed(2), high: d2.high?.toFixed(2), low: d2.low?.toFixed(2), prevClose: null, chgPct: null, vol: d2.volume ? (d2.volume / 1e6).toFixed(1) + 'M' : null, up: true, ts: Date.now(), isDelayed: true };
       tickerPriceCache[ticker] = result;
       return result;
     }
@@ -315,26 +277,19 @@ async function fetchPrice(ticker) {
   return null;
 }
 
-// ── MACRO BAR ─────────────────────────────────────────────────────
 async function loadMacroBar() {
   const bar = document.getElementById('macro-bar');
   bar.innerHTML = '<span class="macro-loading">loading market overview...</span>';
-
-  // Get yesterday's date for prev close (free tier compatible)
   function getPrevTradeDate() {
     const d = new Date();
     d.setHours(0,0,0,0);
-    // Go back until we hit a weekday
     do { d.setDate(d.getDate() - 1); } while (d.getDay() === 0 || d.getDay() === 6);
     return d.toISOString().split('T')[0];
   }
-
   const results = [];
   const dateStr = getPrevTradeDate();
-
   await Promise.all(MACRO_SYMBOLS.map(async sym => {
     try {
-      // Try snapshot first
       const r = await fetch(`https://api.polygon.io/v2/snapshot/locale/us/markets/stocks/tickers/${sym}?apiKey=${POLYGON_KEY}`);
       const d = await r.json();
       if (d.ticker) {
@@ -344,19 +299,12 @@ async function loadMacroBar() {
         const chg = prev && price ? (((price - prev) / prev) * 100).toFixed(2) : null;
         if (price) { results.push({ sym, price: parseFloat(price).toFixed(2), chg, up: chg ? parseFloat(chg) >= 0 : true }); return; }
       }
-      // Fallback: prev close endpoint
       const r2 = await fetch(`https://api.polygon.io/v1/open-close/${sym}/${dateStr}?adjusted=true&apiKey=${POLYGON_KEY}`);
       const d2 = await r2.json();
       if (d2.close) results.push({ sym, price: d2.close.toFixed(2), chg: null, up: true });
     } catch {}
   }));
-
-  if (results.length === 0) {
-    bar.innerHTML = '<span class="macro-loading">// market data unavailable</span>';
-    return;
-  }
-
-  // Sort by MACRO_SYMBOLS order
+  if (results.length === 0) { bar.innerHTML = '<span class="macro-loading">// market data unavailable</span>'; return; }
   results.sort((a,b) => MACRO_SYMBOLS.indexOf(a.sym) - MACRO_SYMBOLS.indexOf(b.sym));
   bar.innerHTML = '';
   results.forEach(r => {
@@ -367,72 +315,39 @@ async function loadMacroBar() {
     bar.appendChild(el);
   });
 }
-// ── TICKER EXTRACTION ─────────────────────────────────────────────
-// Smart ticker extraction — no extra API calls
-// Strategy: only extract if word is explicitly referenced with stock intent context
+
 function extractTickers(text) {
   const upper = text.toUpperCase();
-  
-  // Giant blacklist of common English words and trading terms that aren't tickers
   const BL = new Set([
     'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z',
     'AM','AN','AS','AT','BE','BY','DO','GO','IF','IN','IS','IT','MY','NO','OF','ON','OR','SO','TO','UP','US','VS',
     'THE','AND','FOR','ARE','BUT','NOT','YOU','ALL','CAN','WAS','ONE','OUR','OUT','DAY','GET','HAS','HOW','ITS',
-    'LET','MAY','NEW','NOW','OLD','OWN','SAY','TOO','USE','WAY','WHO','WHY','HIM','HER','HIS','SHE','HIM',
-    'WILL','WITH','BEEN','LOOK','LONG','SELL','WHAT','THAT','THIS','HAVE','FROM','THEY','KNOW','WANT','COME',
-    'SOME','GOOD','JUST','INTO','THAN','THEN','THEM','WELL','ALSO','BACK','EVEN','MOST','TELL','WHEN','MUCH',
-    'VERY','TRADE','STOCK','CHART','PRICE','CHECK','SHORT','BUY','HOLD','RISK','HIGH','LOW','OPEN','CLOSE',
-    'STOP','ENTRY','EXIT','ATM','OTM','ITM','DTE','RSI','EMA','SMA','MACD','CEO','CFO','IPO','AI','EV',
-    'UK','EU','FED','PUT','PUTS','CALL','CALLS','LAST','NEXT','WEEK','MONTH','YEAR','DATE','TIME','RATE',
-    'MOVE','PLAY','IDEA','PICK','SHOW','GIVE','FIND','MAKE','TAKE','SEEM','FEEL','HEAR','SAID','SAYS','LIKE',
-    'OVER','MORE','LESS','EACH','BOTH','MANY','SUCH','SAME','ONLY','REAL','MEAN','NEED','HELP','KEEP','AWAY',
-    'DOWN','LEFT','DOES','DONE','GOES','WENT','WERE','YOUR','THEIR','THERE','THESE','THOSE','ABOUT','ABOVE',
-    'AFTER','AGAIN','BELOW','COULD','EVERY','FIRST','FOUND','GREAT','GROUP','NEVER','OTHER','PLACE','RIGHT',
-    'SMALL','THINK','THREE','UNDER','UNTIL','WHERE','WHICH','WHILE','WORLD','WOULD','WRITE','YEARS','SETUP',
-    'TODAY','LOOK','RECO','RECCO','GIVE','BEST','PICK','IDEA','THINK','FEEL','SEEM','SHOW','TELL','FIND',
-    'MAKE','TAKE','COME','WANT','KNOW','NEED','HELP','KEEP','HOLD','SELL','TRADE','LONG','SHORT','RISK',
-    'STOP','LOSS','GAIN','PLAY','MOVE','DATE','TIME','WEEK','MONTH','YEAR','NEXT','LAST','SAME','ONLY',
-    'REAL','GOOD','JUST','WELL','ALSO','BACK','EVEN','MOST','MUCH','VERY','MORE','LESS','SUCH','BOTH',
-    'EACH','MANY','AWAY','DOWN','LEFT','AWAY','OVER','INTO','THAN','THEM','THEN','WHEN','THAT','THIS',
-    'WITH','FROM','HAVE','BEEN','WILL','WHAT','YOUR','THEY','WERE','SAID','HEAR','FEEL','SEEM','CALL',
-    'NOTE','BASE','CASE','BULL','BEAR','NEWS','DATA','INFO','VIEW','LOOK','SHOW','TELL','FIND','MAKE',
-    'TAKE','COME','WANT','KNOW','AREA','ZONE','LINE','PLAN','STEP','TYPE','KIND','SORT','FORM','PART',
-    'SIDE','BACK','NEXT','LAST','MAIN','FULL','OPEN','HIGH','FREE','FAST','SLOW','HARD','EASY','SAFE',
-    'SURE','ABLE','LIVE','MOVE','TURN','KEEP','HOLD','PULL','PUSH','RISE','FALL','JUMP','DROP','HITS',
-    'RUNS','GOES','SETS','GETS','PUTS','SAYS','SEES','USES','ENDS','ADDS','PAYS','CUTS','HITS','WINS',
-    'TOPS','CAPS','BARS','GAPS','LEGS','ARMS','EYES','EARS','DAYS','WAYS','KEYS','MAPS','TIPS','BIDS',
-    'ASKS','FEES','LOTS','SETS','NETS','BEDS','JETS','KITS','LAGS','MATS','RODS','TABS','TAGS','VARS',
-    'JUNK','FUNK','HUNK','BUNK','DUNK','PUNK','SUNK','RUNT','HUNT','FUND','BOND','LOAN','DEBT','CASH',
-    'FEES','COST','LOSS','GAIN','PROFIT','YIELD','RATE','RATIO','TERM','BETA','ALPHA','DELTA','THETA',
-    'VEGA','GAMMA','SIGMA','OMEGA','COULD','WOULD','SHOULD','MIGHT','SHALL','MUST','NEED','WANT','LIKE',
-    'SEEM','FEEL','KNOW','THINK','MEAN','LOOK','SHOW','TELL','FIND','GIVE','TAKE','MAKE','COME','HELP',
-    'KEEP','HOLD','SELL','TRADE','RISK','STOP','MOVE','DATE','TIME','WEEK','MONTH','YEAR','NEXT','LAST',
-    'ALSO','BACK','EVEN','MOST','MUCH','VERY','MORE','LESS','SUCH','BOTH','EACH','MANY','AWAY','DOWN',
-    'LEFT','OVER','INTO','THAN','THEM','THEN','WHEN','WERE','HAVE','BEEN','WILL','WHAT','YOUR','THEY',
-    'FROM','WITH','THIS','THAT','SAID','CALL','NOTE','BASE','CASE','NEWS','DATA','INFO','VIEW','AREA',
-    'ZONE','LINE','PLAN','STEP','TYPE','KIND','SORT','FORM','PART','SIDE','MAIN','FULL','FREE','FAST',
-    'SLOW','HARD','EASY','SAFE','SURE','ABLE','LIVE','TURN','PULL','PUSH','RISE','FALL','JUMP','DROP',
-    'RUNS','SETS','GETS','SAYS','SEES','USES','ENDS','ADDS','PAYS','CUTS','WINS','TOPS','CAPS','BARS',
-    'GAPS','LEGS','DAYS','WAYS','KEYS','TIPS','BIDS','ASKS','LOTS','NETS','JUNK','FUNK','BOND','LOAN',
-    'DEBT','CASH','COST','YIELD','TERM','STILL','THREE','FIRST','ABOVE','EVERY','PLACE','SMALL','THINK',
-    'UNDER','UNTIL','WHICH','WORLD','WRITE','SETUP','TODAY','RECO','RECCO','AHEAD','BASED','RANGE',
-    'ONCE','BEST','TEST','APRIL','KEY','TRY','LL','ME','ONCE','AHEAD','TERM','BULL','BEAR','BASE',
-    'NOTE','RATE','BETA','LONG','PUTS','CALL','GAIN','LOSS','RISK','STOP','DATE','AREA','LINE','PLAN',
-    'FORM','SIDE','MAIN','FULL','LIVE','TURN','PULL','PUSH','RISE','FALL','JUMP','DROP','RUNS','SETS',
-    'GETS','SAYS','SEES','USES','ENDS','ADDS','PAYS','CUTS','WINS','TOPS','GAPS','DAYS','WAYS','TIPS'
+    'LET','MAY','NEW','NOW','OLD','OWN','SAY','TOO','USE','WAY','WHO','WHY','WILL','WITH','BEEN','LOOK','LONG',
+    'SELL','WHAT','THAT','THIS','HAVE','FROM','THEY','KNOW','WANT','COME','SOME','GOOD','JUST','INTO','THAN',
+    'THEN','THEM','WELL','ALSO','BACK','EVEN','MOST','TELL','WHEN','MUCH','VERY','TRADE','STOCK','CHART','PRICE',
+    'CHECK','SHORT','BUY','HOLD','RISK','HIGH','LOW','OPEN','CLOSE','STOP','ENTRY','EXIT','ATM','OTM','ITM',
+    'DTE','RSI','EMA','SMA','MACD','CEO','CFO','IPO','AI','EV','UK','EU','FED','PUT','PUTS','CALL','CALLS',
+    'LAST','NEXT','WEEK','MONTH','YEAR','DATE','TIME','RATE','MOVE','PLAY','IDEA','PICK','SHOW','GIVE','FIND',
+    'MAKE','TAKE','SEEM','FEEL','HEAR','SAID','SAYS','LIKE','OVER','MORE','LESS','EACH','BOTH','MANY','SUCH',
+    'SAME','ONLY','REAL','MEAN','NEED','HELP','KEEP','AWAY','DOWN','LEFT','DOES','DONE','GOES','WENT','WERE',
+    'YOUR','THEIR','THERE','THESE','THOSE','ABOUT','ABOVE','AFTER','AGAIN','BELOW','COULD','EVERY','FIRST',
+    'FOUND','GREAT','GROUP','NEVER','OTHER','PLACE','RIGHT','SMALL','THINK','THREE','UNDER','UNTIL','WHERE',
+    'WHICH','WHILE','WORLD','WOULD','WRITE','YEARS','SETUP','TODAY','RECO','BEST','NOTE','BASE','CASE','BULL',
+    'BEAR','NEWS','DATA','INFO','VIEW','AREA','ZONE','LINE','PLAN','STEP','TYPE','KIND','SORT','FORM','PART',
+    'SIDE','MAIN','FULL','FREE','FAST','SLOW','HARD','EASY','SAFE','SURE','ABLE','LIVE','TURN','PULL','PUSH',
+    'RISE','FALL','JUMP','DROP','FUND','BOND','LOAN','DEBT','CASH','COST','LOSS','GAIN','TERM','BETA','ALPHA',
+    'DELTA','THETA','VEGA','GAMMA','SIGMA','COULD','WOULD','SHOULD','MIGHT','SHALL','MUST','STILL','AHEAD',
+    'BASED','RANGE','ONCE','APRIL','KEY','TRY','FORWARD','MARKET','SECTOR','STRONG','CLEAN','CLEAR','COMING',
+    'FIND','HIGH','CONVICTION','FUNDAMENTAL','TECHNICAL','CATALYST'
   ]);
-
-  // Known ETFs/indices we always want to allow
   const ALWAYS_ALLOW = new Set([
     'SPY','QQQ','IWM','VIX','USO','GLD','SLV','TLT','HYG','XLF','XLE','XLK','XLV','XBI','XOP',
     'DIA','ARKK','SQQQ','TQQQ','UVXY','LABD','SPXU','SPXL','UPRO','SDOW','UDOW','VIXY'
   ]);
-
-  const words = upper.match(/[A-Z]{2,5}/g) || [];
+  const words = upper.match(/[A-Z]{2,5}/g) || [];
   return [...new Set(words.filter(w => ALWAYS_ALLOW.has(w) || (!BL.has(w) && w.length >= 2)))].slice(0, 4);
 }
 
-// ── TICKER BAR ────────────────────────────────────────────────────
 async function addToTickerBar(tickers) {
   if (!tickers || !tickers.length) return;
   const bar = document.getElementById('ticker-bar');
@@ -449,7 +364,6 @@ async function addToTickerBar(tickers) {
   }
 }
 
-// ── TRADINGVIEW CHART ─────────────────────────────────────────────
 function buildTVUrl(ticker, interval) {
   return `https://s.tradingview.com/widgetembed/?symbol=${encodeURIComponent(ticker)}&interval=${interval}&theme=dark&style=1&timezone=America%2FNew_York&toolbar_bg=0d0d0d&hide_side_toolbar=0&allow_symbol_change=0&save_image=0&studies=RSI%40tv-basicstudies&hideideas=1&width=100%25&height=280`;
 }
@@ -458,7 +372,6 @@ function buildChartElement(ticker, interval) {
   interval = interval || 'D';
   const wrap = document.createElement('div');
   wrap.className = 'chart-wrap';
-
   const header = document.createElement('div');
   header.className = 'chart-header';
   header.innerHTML = `<span class="chart-title">${ticker}</span><div class="chart-tf-btns">
@@ -467,20 +380,16 @@ function buildChartElement(ticker, interval) {
     <button class="tf-btn ${interval==='W'?'active':''}" onclick="switchTF(this,'${ticker}','W')">1W</button>
     <button class="tf-btn ${interval==='M'?'active':''}" onclick="switchTF(this,'${ticker}','M')">1M</button>
   </div>`;
-
   const iframeWrap = document.createElement('div');
   iframeWrap.className = 'chart-iframe-wrap';
   iframeWrap.id = 'ifw-' + ticker;
-
   const loading = document.createElement('div');
   loading.className = 'chart-loading';
   loading.textContent = 'LOADING CHART...';
-
   const iframe = document.createElement('iframe');
   iframe.src = buildTVUrl(ticker, interval);
   iframe.allow = 'fullscreen';
   iframe.onload = () => loading.style.display = 'none';
-
   iframeWrap.appendChild(loading);
   iframeWrap.appendChild(iframe);
   wrap.appendChild(header);
@@ -492,7 +401,6 @@ window.switchTF = function(btn, ticker, interval) {
   const ifw = document.getElementById('ifw-' + ticker);
   if (!ifw) return;
   ifw.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
-  // find active in header
   btn.classList.add('active');
   const loading = ifw.querySelector('.chart-loading');
   if (loading) loading.style.display = 'flex';
@@ -503,10 +411,7 @@ window.switchTF = function(btn, ticker, interval) {
 function openChart(ticker) {
   const msgs = document.getElementById('messages');
   const existingId = 'chartmsg-' + ticker;
-  if (document.getElementById(existingId)) {
-    document.getElementById(existingId).scrollIntoView({ behavior: 'smooth' });
-    return;
-  }
+  if (document.getElementById(existingId)) { document.getElementById(existingId).scrollIntoView({ behavior: 'smooth' }); return; }
   const wrap = document.createElement('div');
   wrap.className = 'msg ai';
   wrap.id = existingId;
@@ -519,7 +424,6 @@ function openChart(ticker) {
   msgs.scrollTop = msgs.scrollHeight;
 }
 
-// ── BLACK-SCHOLES GREEKS (estimated) ─────────────────────────────
 function normCDF(x) {
   const a1=0.254829592,a2=-0.284496736,a3=1.421413741,a4=-1.453152027,a5=1.061405429,p=0.3275911;
   const sign = x < 0 ? -1 : 1;
@@ -528,9 +432,7 @@ function normCDF(x) {
   const y = 1 - (((((a5*t+a4)*t)+a3)*t+a2)*t+a1)*t*Math.exp(-x*x);
   return 0.5 * (1 + sign * y);
 }
-
 function normPDF(x) { return Math.exp(-0.5*x*x) / Math.sqrt(2*Math.PI); }
-
 function calcGreeks(S, K, T, r, sigma, isCall) {
   if (T <= 0 || sigma <= 0) return null;
   const d1 = (Math.log(S/K) + (r + 0.5*sigma*sigma)*T) / (sigma*Math.sqrt(T));
@@ -539,21 +441,13 @@ function calcGreeks(S, K, T, r, sigma, isCall) {
   const gamma = normPDF(d1) / (S * sigma * Math.sqrt(T));
   const theta = (-(S * normPDF(d1) * sigma) / (2 * Math.sqrt(T)) - r * K * Math.exp(-r*T) * (isCall ? normCDF(d2) : normCDF(-d2))) / 365;
   const vega = S * normPDF(d1) * Math.sqrt(T) / 100;
-  return {
-    delta: delta.toFixed(3),
-    gamma: gamma.toFixed(4),
-    theta: theta.toFixed(3),
-    vega: vega.toFixed(3)
-  };
+  return { delta: delta.toFixed(3), gamma: gamma.toFixed(4), theta: theta.toFixed(3), vega: vega.toFixed(3) };
 }
-
 function renderGreeks(S, K, expDays, ivPct, isCall, container) {
   const T = expDays / 365;
   const sigma = ivPct / 100;
-  const r = 0.05;
-  const g = calcGreeks(S, K, T, r, sigma, isCall);
+  const g = calcGreeks(S, K, T, 0.05, sigma, isCall);
   if (!g) return;
-
   const box = document.createElement('div');
   box.className = 'greeks-box';
   box.innerHTML = `
@@ -566,7 +460,6 @@ function renderGreeks(S, K, expDays, ivPct, isCall, container) {
   container.appendChild(box);
 }
 
-// ── P&L CURVE ─────────────────────────────────────────────────────
 function renderPnLChart(maxLoss, maxGain, breakeven, currentPrice, container) {
   const wrap = document.createElement('div');
   wrap.className = 'pnl-wrap';
@@ -576,7 +469,6 @@ function renderPnLChart(maxLoss, maxGain, breakeven, currentPrice, container) {
   canvas.width = 600; canvas.height = 120;
   wrap.appendChild(canvas);
   container.appendChild(wrap);
-
   requestAnimationFrame(() => {
     const ctx = canvas.getContext('2d');
     const W = canvas.offsetWidth || 600;
@@ -585,58 +477,37 @@ function renderPnLChart(maxLoss, maxGain, breakeven, currentPrice, container) {
     const lo = currentPrice * 0.85;
     const hi = currentPrice * 1.15;
     const range = hi - lo;
-
     ctx.clearRect(0, 0, W, H);
-
-    // Grid
-    ctx.strokeStyle = '#1e1e1e';
+    ctx.strokeStyle = '#333';
+    ctx.setLineDash([3,3]);
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(0, H/2); ctx.lineTo(W, H/2);
     ctx.stroke();
-
-    // Zero line
-    ctx.strokeStyle = '#333';
-    ctx.setLineDash([3,3]);
-    ctx.beginPath();
-    ctx.moveTo(0, H/2); ctx.lineTo(W, H/2);
-    ctx.stroke();
     ctx.setLineDash([]);
-
-    // P&L line
-    ctx.beginPath();
     ctx.lineWidth = 2;
     for (let px = 0; px <= W; px++) {
       const price = lo + (px/W) * range;
       let pnl;
-      if (price <= breakeven * 0.95) {
-        pnl = -maxLoss;
-      } else if (price >= breakeven * 1.05) {
-        pnl = Math.min(maxGain, (price - breakeven) * 100);
-      } else {
-        pnl = -maxLoss + (maxLoss + maxGain) * ((price - breakeven * 0.95) / (breakeven * 0.1));
-      }
+      if (price <= breakeven * 0.95) pnl = -maxLoss;
+      else if (price >= breakeven * 1.05) pnl = Math.min(maxGain, (price - breakeven) * 100);
+      else pnl = -maxLoss + (maxLoss + maxGain) * ((price - breakeven * 0.95) / (breakeven * 0.1));
       const y = H/2 - (pnl / (maxGain * 1.2)) * (H/2 - 10);
       const clampedY = Math.max(5, Math.min(H-5, y));
-      if (px === 0) ctx.moveTo(px, clampedY);
-      else ctx.lineTo(px, clampedY);
       ctx.strokeStyle = pnl >= 0 ? '#00ff88' : '#ff4455';
+      ctx.beginPath();
+      if (px === 0) ctx.moveTo(px, clampedY);
+      else { ctx.moveTo(px-1, clampedY); ctx.lineTo(px, clampedY); }
+      ctx.stroke();
     }
-    ctx.stroke();
-
-    // Labels
-    ctx.fillStyle = '#444';
-    ctx.font = '9px JetBrains Mono';
+    ctx.fillStyle = '#444'; ctx.font = '9px JetBrains Mono';
     ctx.fillText('$' + lo.toFixed(0), 4, H-4);
     ctx.fillText('$' + hi.toFixed(0), W-40, H-4);
-    ctx.fillStyle = '#00ff88';
-    ctx.fillText('+$' + maxGain, 4, 12);
-    ctx.fillStyle = '#ff4455';
-    ctx.fillText('-$' + maxLoss, 4, H/2 + 16);
+    ctx.fillStyle = '#00ff88'; ctx.fillText('+$' + maxGain, 4, 12);
+    ctx.fillStyle = '#ff4455'; ctx.fillText('-$' + maxLoss, 4, H/2 + 16);
   });
 }
 
-// ── MARKDOWN ──────────────────────────────────────────────────────
 function md(text) {
   return text
     .replace(/^---$/gm, '<hr>')
@@ -654,7 +525,6 @@ function md(text) {
     .replace(/\n/g, '<br>');
 }
 
-// ── UI HELPERS ────────────────────────────────────────────────────
 function setNote(t) {
   const el = document.getElementById('status-note');
   el.textContent = t ? `// ${t}` : '';
@@ -669,19 +539,15 @@ function addMsg(role, text, tickers, extras) {
   const c = document.getElementById('messages');
   const wrap = document.createElement('div');
   wrap.className = `msg ${role === 'user' ? 'user' : 'ai'}`;
-
   const label = document.createElement('div');
   label.className = 'msg-label';
   label.innerHTML = `${role === 'user' ? 'YOU' : 'ANALYST'}<span class="msg-time">${ts()}</span>`;
-
   const bubble = document.createElement('div');
   bubble.className = 'msg-bubble';
   bubble.innerHTML = role === 'user' ? text : md(text);
-
   wrap.appendChild(label);
   wrap.appendChild(bubble);
 
-  // Sources
   if (role === 'ai' && lastSearches.length > 0) {
     const srcBox = document.createElement('div');
     srcBox.className = 'sources-box';
@@ -689,21 +555,14 @@ function addMsg(role, text, tickers, extras) {
     bubble.appendChild(srcBox);
   }
 
-  // Action row
   if (role === 'ai') {
     const actions = document.createElement('div');
     actions.className = 'msg-actions';
-
-    // Copy button
     const copyBtn = document.createElement('button');
     copyBtn.className = 'action-btn';
     copyBtn.textContent = 'COPY';
-    copyBtn.onclick = () => {
-      navigator.clipboard.writeText(text).then(() => { copyBtn.textContent = 'COPIED'; setTimeout(() => copyBtn.textContent = 'COPY', 2000); });
-    };
+    copyBtn.onclick = () => { navigator.clipboard.writeText(text).then(() => { copyBtn.textContent = 'COPIED'; setTimeout(() => copyBtn.textContent = 'COPY', 2000); }); };
     actions.appendChild(copyBtn);
-
-    // Chart button for first ticker
     if (tickers && tickers.length > 0) {
       const chartBtn = document.createElement('button');
       chartBtn.className = 'action-btn';
@@ -711,25 +570,16 @@ function addMsg(role, text, tickers, extras) {
       chartBtn.onclick = () => openChart(tickers[0]);
       actions.appendChild(chartBtn);
     }
-
     bubble.appendChild(actions);
   }
 
-  // Auto-embed chart only for substantive analysis (not short answers)
   if (role === 'ai' && tickers && tickers.length > 0 && text.length > 300) {
     bubble.appendChild(buildChartElement(tickers[0], 'D'));
   }
 
-  // Extras: greeks, pnl
   if (extras) {
-    if (extras.greeks) {
-      const { S, K, expDays, iv, isCall } = extras.greeks;
-      renderGreeks(S, K, expDays, iv, isCall, bubble);
-    }
-    if (extras.pnl) {
-      const { maxLoss, maxGain, breakeven, currentPrice } = extras.pnl;
-      renderPnLChart(maxLoss, maxGain, breakeven, currentPrice, bubble);
-    }
+    if (extras.greeks) { const { S, K, expDays, iv, isCall } = extras.greeks; renderGreeks(S, K, expDays, iv, isCall, bubble); }
+    if (extras.pnl) { const { maxLoss, maxGain, breakeven, currentPrice } = extras.pnl; renderPnLChart(maxLoss, maxGain, breakeven, currentPrice, bubble); }
   }
 
   c.appendChild(wrap);
@@ -747,7 +597,6 @@ function showThinking(label) {
   c.scrollTop = c.scrollHeight;
 }
 
-// ── SETUP / SESSION ───────────────────────────────────────────────
 function saveKey() {
   const k = document.getElementById('api-key-input').value.trim();
   if (!k.startsWith('sk-ant-')) { alert('Key should start with sk-ant-'); return; }
@@ -777,7 +626,6 @@ function clearSession() {
 }
 
 function trimHistory() {
-  // Only trim on complete user/assistant pairs to avoid breaking tool_use chains
   const userIdxs = chatHistory.reduce((acc, m, i) => { if (m.role === 'user') acc.push(i); return acc; }, []);
   if (userIdxs.length > MAX_HISTORY) {
     const cutIdx = userIdxs[userIdxs.length - MAX_HISTORY];
@@ -785,12 +633,8 @@ function trimHistory() {
   }
 }
 
-// ── PDF EXPORT ────────────────────────────────────────────────────
 function exportPDF() {
   const msgs = document.getElementById('messages');
-  const original = document.body.style.cssText;
-
-  // Build print content
   const printWin = window.open('', '_blank');
   printWin.document.write(`
     <html><head><title>TradeChat Pro — Session Export</title>
@@ -805,43 +649,31 @@ function exportPDF() {
     </style></head><body>
     <h1>TradeChat Pro — Session Export<br><small style="font-size:11px;color:#666">${new Date().toLocaleString()}</small></h1>
   `);
-
   msgs.querySelectorAll('.msg').forEach(m => {
     const isUser = m.classList.contains('user');
     const label = m.querySelector('.msg-label')?.textContent?.replace(/\d+:\d+\s*(AM|PM)/i,'').trim() || '';
     const bubble = m.querySelector('.msg-bubble');
     if (!bubble) return;
-    printWin.document.write(`
-      <div class="msg">
-        <div class="role ${isUser?'you':''}">${label}</div>
-        <div class="content">${bubble.innerText}</div>
-      </div>
-    `);
+    printWin.document.write(`<div class="msg"><div class="role ${isUser?'you':''}">${label}</div><div class="content">${bubble.innerText}</div></div>`);
   });
-
-  printWin.document.write(`<div class="disclaimer">⚠ Not financial advice. For informational and educational purposes only. Always do your own research before making any investment decisions.</div></body></html>`);
+  printWin.document.write(`<div class="disclaimer">⚠ Not financial advice. For informational and educational purposes only.</div></body></html>`);
   printWin.document.close();
   printWin.focus();
   setTimeout(() => { printWin.print(); }, 500);
 }
 
-// ── EXTRACT TRADE PARAMS for Greeks/PnL ──────────────────────────
 function extractTradeParams(text, currentPrice) {
-  // Try to extract strike, expiration, type from response text
   const callMatch = text.match(/\$(\d+)\s*call/i);
   const putMatch = text.match(/\$(\d+)\s*put/i);
   const strikeMatch = callMatch || putMatch;
   const isCall = !!callMatch;
   const strike = strikeMatch ? parseFloat(strikeMatch[1]) : null;
-
   const maxLossMatch = text.match(/max\s*loss[:\s~]+\$?([\d,]+)/i);
   const maxGainMatch = text.match(/max\s*gain[:\s~]+\$?([\d,]+)/i);
   const maxLoss = maxLossMatch ? parseFloat(maxLossMatch[1].replace(',','')) : null;
   const maxGain = maxGainMatch ? parseFloat(maxGainMatch[1].replace(',','')) : null;
-
   const dteMatch = text.match(/(\d+)\s*DTE/i) || text.match(/(\d+)\s*day/i);
   const expDays = dteMatch ? parseInt(dteMatch[1]) : 30;
-
   if (strike && maxLoss && maxGain && currentPrice) {
     return {
       greeks: { S: currentPrice, K: strike, expDays, iv: 30, isCall },
@@ -851,47 +683,83 @@ function extractTradeParams(text, currentPrice) {
   return null;
 }
 
-// ── CLAUDE API ────────────────────────────────────────────────────
 const TODAY = new Date().toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
 
-const SYSTEM = `You are a professional trading analyst assistant with real-time web search capabilities.
+const SYSTEM = `You are an elite buy-side trading analyst. You think like a hedge fund PM, not a retail chatbot.
 
 Today's date: ${TODAY}
 
-PRICE PROTOCOL: Always use web_search to find the current price before any analysis. Search "[TICKER] stock price today ${new Date().toLocaleDateString()}". Never use prices from memory.
+CORE PHILOSOPHY:
+- Depth over speed. Never give a surface-level answer when deeper research is possible.
+- Contrarian when warranted. Do not default to the obvious consensus pick (NVDA, AAPL, SPY) unless the data genuinely and specifically supports it over alternatives. If you recommend a mega-cap, justify WHY with hard data vs peers.
+- Cite specific numbers with dates. Vague claims like "strong fundamentals" are worthless without proof.
+- Be honest about uncertainty. If a setup is weak or risk/reward is poor, say so clearly.
+- The AVGO vs NVDA comparison style is the gold standard: specific metrics, peer context, clear conclusion.
 
-RESEARCH: Before any recommendation, search for: current price, recent price action, upcoming earnings date, implied volatility level, analyst price targets, and any major recent news.
+MANDATORY RESEARCH SEQUENCE — run ALL of these before any stock recommendation:
+1. Current price and today's price action (search "[TICKER] stock price today [current date]")
+2. Recent earnings results and EXACT next earnings date and DTE
+3. Implied volatility level and IV rank vs 52-week range
+4. Analyst consensus, recent upgrades/downgrades, price target spread (bull vs bear)
+5. Key recent news, institutional flow, or unusual options activity
+6. Relevant macro or sector tailwinds/headwinds
+7. One non-obvious risk the market may be underpricing
+
+OPTIONS STRUCTURE RULES — always follow these:
+- IV Rank > 50: SELL premium or use spreads (credit spreads, iron condors). Do NOT buy naked options.
+- IV Rank 30-50: Debit spreads or defined-risk structures preferred.
+- IV Rank < 30: Buying premium (calls/puts) is justified. Spreads optional.
+- Earnings within 21 DTE: Flag prominently. Adjust structure to straddle, iron condor, or post-earnings play. Never recommend naked long calls/puts into earnings without explicit warning.
+- Always state WHY the structure was chosen based on IV context.
+
+FOR STOCK SCREENING / PICK REQUESTS:
+- Do not default to NVDA, AAPL, MSFT, or SPY unless they are genuinely the best answer.
+- Search for less obvious, higher-conviction setups. Look at sector rotation, recent breakouts, unusual volume, or names with specific near-term catalysts.
+- Compare at least 2-3 candidates before picking one.
+- State what makes this pick non-consensus and where the edge is.
 
 FORMAT for trade recommendations:
 ## SETUP: [TICKER] — [BULLISH/BEARISH/NEUTRAL]
-**Current Price:** $[from live search today]
-**Thesis:** [one sentence]
+**Current Price:** $[from live search — never from memory]
+**Thesis:** [one sharp sentence — what is the actual edge here]
 
 **Bull Case:**
-- [data point]
-- [data point]
+- [specific data point with date]
+- [specific data point]
 
 **Bear Case:**
-- [data point]
-- [data point]
+- [specific data point]
+- [non-obvious risk the market may be underpricing]
 
-**Evidence:** [3+ specific sourced data points with dates]
-**Earnings:** [exact next earnings date — warn if options could be affected]
-**IV Context:** [current IV level, High/Normal/Low, and implication: sell or buy premium]
+**Evidence:** [3+ hard numbers: revenue, EPS, margins, FCF, analyst targets — all with dates]
+**Earnings:** [exact date + DTE] — [WARN if within 21 days]
+**IV Context:** IV rank [X] — [High/Normal/Low] — [explicit implication: buy or sell premium, and why]
 
 **Trade:**
-- Structure: [exact structure]
+- Structure: [exact structure + one sentence explaining why this structure given IV]
 - Strikes: [specific strikes]
 - Expiration: [specific date, X DTE]
 - Est. Cost: ~$[X] per contract
 - Max Loss: ~$[X] | Max Gain: ~$[X] | R/R: [X:1]
 
-**Entry:** [specific level or condition]
+**Entry:** [specific price level or technical trigger]
 **Stop:** [specific level]
 **Targets:** T1: $[X] | T2: $[X]
-**Risk Factors:** [specific risks]
+**Risk Factors:** [be specific — not generic boilerplate]
 
-RULES: Always search first. Use today's actual prices. Cite specific data with dates. Flag earnings. Do not assume user's capital or risk tolerance unless they tell you. Be direct.`;
+FOR MACRO / MARKET QUESTIONS:
+Respond with this structure:
+**What's Working:** [sectors/themes with momentum and why]
+**What's Not:** [sectors being sold and why]
+**Smart Money Positioning:** [where institutional flow is going based on recent data]
+**Key Risk This Week:** [specific catalyst — Fed, CPI, earnings, geopolitical]
+**Bottom Line:** [one actionable takeaway]
+
+RULES:
+- Always search before answering. Never use prices or earnings dates from memory — they will be wrong.
+- Every number you cite must have a source date.
+- Be direct. Cut filler. Every sentence must add information.
+- If you cannot find data to support a claim, say so rather than guessing.`;
 
 async function callClaude(messages) {
   const res = await fetch('https://api.anthropic.com/v1/messages', {
@@ -917,24 +785,17 @@ async function callClaude(messages) {
   return res.json();
 }
 
-// ── MAIN SEND ─────────────────────────────────────────────────────
 async function send() {
   const inp = document.getElementById('user-input');
   const text = inp.value.trim();
   if (!text || !API_KEY) return;
-
   inp.value = '';
   inp.style.height = '40px';
   document.getElementById('send-btn').disabled = true;
   lastSearches = [];
-
   addMsg('user', text);
-
-  // Extract tickers and fetch live prices
   const tickers = extractTickers(text);
   await addToTickerBar(tickers);
-
-  // Build price context from Polygon
   let priceCtx = '';
   if (tickers.length > 0) {
     const priceData = await Promise.all(tickers.map(fetchPrice));
@@ -951,84 +812,53 @@ async function send() {
         }).join('\n');
     }
   }
-
-  // Push to history
   chatHistory.push({ role: 'user', content: text + priceCtx });
   trimHistory();
-
   setNote('searching live data...');
   showThinking('Researching');
-
   try {
     let data = await callClaude(chatHistory);
     let searchCount = 0;
-
-    // Agentic search loop
     while (data.stop_reason === 'tool_use' && searchCount < 8) {
       searchCount++;
-
-      // Store what was searched for sources display
       const toolUses = data.content.filter(b => b.type === 'tool_use');
-      toolUses.forEach(b => {
-        if (b.input?.query) lastSearches.push(b.input.query);
-      });
-
-      // Push assistant content to history
+      toolUses.forEach(b => { if (b.input?.query) lastSearches.push(b.input.query); });
       chatHistory.push({ role: 'assistant', content: data.content });
-
       const queries = toolUses.map(b => b.input?.query).filter(Boolean);
       if (queries.length) setNote(`searching: "${queries[0]}"`);
-
-      // Push tool results — Claude's web_search tool handles the actual fetching
-      // We just need to acknowledge each tool_use with a tool_result
-      const toolResults = toolUses.map(b => ({
-        type: 'tool_result',
-        tool_use_id: b.id,
-        content: 'Search completed.'
-      }));
-
+      const toolResults = toolUses.map(b => ({ type: 'tool_result', tool_use_id: b.id, content: 'Search completed.' }));
       chatHistory.push({ role: 'user', content: toolResults });
       showThinking(`Analyzing (${searchCount} searches)`);
       data = await callClaude(chatHistory);
     }
-
     document.getElementById('thinking')?.remove();
     setNote('');
-
     if (data.error) {
       addMsg('ai', `Error: ${data.error.message}`);
       chatHistory.pop();
     } else {
       const textBlocks = data.content.filter(b => b.type === 'text');
       const reply = textBlocks.map(b => b.text).join('\n').trim();
-
       if (!reply) {
         addMsg('ai', 'No response generated. Try rephrasing your question.');
         chatHistory.pop();
       } else {
         chatHistory.push({ role: 'assistant', content: data.content });
         trimHistory();
-
-        // Only use tickers from user input (not AI response - causes false positives)
-        const allTickers = tickers;
-
-        // Try to extract trade params for greeks/pnl
         let extras = null;
-        if (allTickers.length > 0 && tickerPriceCache[allTickers[0]]) {
-          const price = parseFloat(tickerPriceCache[allTickers[0]].price);
+        if (tickers.length > 0 && tickerPriceCache[tickers[0]]) {
+          const price = parseFloat(tickerPriceCache[tickers[0]].price);
           extras = extractTradeParams(reply, price);
         }
-
-        addMsg('ai', reply, allTickers.length > 0 ? allTickers : null, extras);
+        addMsg('ai', reply, tickers.length > 0 ? tickers : null, extras);
       }
     }
-
   } catch (e) {
     document.getElementById('thinking')?.remove();
     setNote('');
     const errMsg = e.message || 'Unknown error';
     if (errMsg.includes('rate limit') || errMsg.includes('529')) {
-      addMsg('ai', 'Rate limit reached. Wait 60 seconds then try again. For complex research questions, try asking about one ticker at a time.');
+      addMsg('ai', 'Rate limit reached. Wait 60 seconds then try again.');
     } else if (errMsg.includes('401') || errMsg.includes('invalid')) {
       addMsg('ai', 'API key rejected. Click NEW SESSION to re-enter your key.');
       localStorage.removeItem('tcp_key');
@@ -1039,7 +869,6 @@ async function send() {
     }
     chatHistory.pop();
   }
-
   document.getElementById('send-btn').disabled = false;
   inp.focus();
 }
